@@ -40,6 +40,7 @@
   line-height: 62px;
   font-size: 24px;
   color: #000;
+  cursor: pointer;
 }
 
 .registerButton:hover {
@@ -57,6 +58,7 @@
   line-height: 62px;
   font-size: 24px;
   color: #000;
+  cursor: pointer;
 }
 
 .backButton:hover {

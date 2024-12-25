@@ -1,5 +1,5 @@
 /**
- * ScheduleModal
+ * ScheduleEditModal
  */
 import { useForm, SubmitHandler } from "react-hook-form";
 /**
@@ -10,10 +10,10 @@ import { SelectField } from "@/components/ui/SelectField/page";
 /**
  * styles
  */
-import styles from "./ScheduleModal.module.css"
+import styles from "./ScheduleEditModal.module.css"
 
 // formで利用する値のtype指定
-interface ScheduleForm {
+interface ScheduleEditForm {
   date: Date;
   prefectures: string;
   destination1: string;
@@ -22,36 +22,37 @@ interface ScheduleForm {
 };
 
 interface Props {
-  isScheduleModalOpnen: boolean;
-  handleCloseScheduleModal: () => void;
+  isSheduleEditModalOpen: boolean;
+  handleCloseSheduleEditModal: () => void;
 }
 
-export const ScheduleModal = (props: Props) => {
-  const {isScheduleModalOpnen, handleCloseScheduleModal} = props
+export const ScheduleEditModal = (props: Props) => {
+  const {isSheduleEditModalOpen, handleCloseSheduleEditModal} = props
 
   // カスタムフックの指定
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: {errors}
-  } = useForm<ScheduleForm>({
-    // 変更ボタンを押したときのみバリデーションを行う
-    reValidateMode: 'onSubmit',
-  });
+    const {
+      register,
+      handleSubmit,
+      reset,
+      formState: {errors}
+    } = useForm<ScheduleEditForm>({
+      // 変更ボタンを押したときのみバリデーションを行う
+      reValidateMode: 'onSubmit',
+    });
+
 
   // 空フォームのデータが空文字列で送られるため要検討 //
   /**
    * データ送信処理
    * @param data 
    */
-  const onSubmit: SubmitHandler<ScheduleForm> = (data) => {
-      console.log(data);
-      reset();
-      handleCloseScheduleModal();
+  const onSubmit: SubmitHandler<ScheduleEditForm> = (data) => {
+    console.log(data);
+    reset();
+    handleCloseSheduleEditModal();
   };
-  
-  if (!isScheduleModalOpnen) {
+
+  if (!isSheduleEditModalOpen) {
     return <></>
   }
 
@@ -67,26 +68,14 @@ export const ScheduleModal = (props: Props) => {
             id="date"
             type="date"
             placeholder="日時"
-            register={register('date', {
-              required: {
-                value: true,
-                message: '日時を入力してください'
-              },
-            })}
-            error={errors.date}
+            register={register('date')}
           />
         </div>
         {/* 都道府県フィールド */}
         <div className={styles.inputArea}>
           <SelectField 
             id="prefectures"
-            register={register('prefectures', {
-              required: {
-                value: true,
-                message: '都道府県を入力してください'
-              },
-            })}
-            error={errors.prefectures}
+            register={register('prefectures')}
           />
         </div>
         {/* 目的地1フィールド */}
@@ -95,13 +84,7 @@ export const ScheduleModal = (props: Props) => {
             id="destination1"
             type="text"
             placeholder="目的地1"
-            register={register('destination1', {
-              required: {
-                value: true,
-                message: '目的地1を入力してください'
-              },
-            })}
-            error={errors.destination1}
+            register={register('destination1')}
           />
         </div>
         {/* 目的地2フィールド */}
@@ -125,12 +108,12 @@ export const ScheduleModal = (props: Props) => {
       
         {/* ボタンエリア */}
         <section className={styles.buttonArea}>
-          {/* 新規登録ボタン */}
+          {/* 変更ボタン */}
           <button type="submit" className={styles.registerButton}>
-            追加
+            変更
           </button>
           {/* 戻るボタン */}
-          <div onClick={handleCloseScheduleModal} className={styles.backButton}>戻る</div>
+          <div onClick={handleCloseSheduleEditModal} className={styles.backButton}>戻る</div>
         </section>
       </form>
     </section>
