@@ -15,13 +15,17 @@ import {
  */
 import { EditModal } from "@/components/layout/EditModal/page";
 import { ScheduleModal } from "@/components/layout/ScheduleModal/page";
+import { BarChart } from "@/components/layout/BarChart/page";
 /**
  * styles
  */
 import styles from "./page.module.css";
 
+// サンプルデータ
+const labels = ["沖縄", "北海道", "長野", "京都", "広島"];
+const data1 = [10, 7, 5, 3, 3];
+
 export default function Home() {
-  
   // モーダルの開閉処理を管理
   const [isEditModalOpen, setIsEditModalOpne] = React.useState(false);
   const [isScheduleModalOpnen, setIsScheduleModalOpne] = React.useState(false);
@@ -39,6 +43,7 @@ export default function Home() {
   const handleCloseScheduleModal = () => {
     setIsScheduleModalOpne((isScheduleModalOpnen) => !isScheduleModalOpnen);
   };
+
 
   return (
     <>
@@ -71,8 +76,11 @@ export default function Home() {
       {/* 旅行の軌跡表示領域 */}
         <section className={styles.trajectoryArea}>
           <h2>旅行の軌跡</h2>
-
           <div className={styles.showMap}>地図を表示</div>
+          <BarChart
+            labels={labels}
+            data={data1}
+          />
         </section>
     </>
   );
