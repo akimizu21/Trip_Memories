@@ -1,0 +1,64 @@
+.orverlay {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: 70%;
+  height: 90%;
+  background: #dbdbdb;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.formArea {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 32px auto;
+}
+
+.inputArea {
+  width: 30%;
+  margin: 0 auto;
+}
+
+.buttonArea {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.registerButton {
+  text-decoration: none;
+  width: 15%;
+  height: 64px;
+  border: 1px solid #000;
+  background: #FF8A8A;
+  border-radius: 30px;
+  text-decoration: none;
+  line-height: 62px;
+  font-size: 24px;
+  color: #000;
+}
+
+.registerButton:hover {
+  opacity: 0.7;
+}
+
+.backButton {
+  text-decoration: none;
+  width: 15%;
+  height: 64px;
+  border: 1px solid #000;
+  background: #F0EAAC;
+  border-radius: 30px;
+  text-decoration: none;
+  line-height: 62px;
+  font-size: 24px;
+  color: #000;
+}
+
+.backButton:hover {
+  opacity: 0.7;
+}
