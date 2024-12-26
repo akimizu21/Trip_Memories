@@ -23,15 +23,19 @@ ENGINE = create_engine(
 )
 
 # Sessionの作成
-session = scoped_session(
-  sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=ENGINE,
-  )
+SessionLocal = sessionmaker(
+  autocommit=False,
+  autoflush=False,
+  bind=ENGINE,
 )
 
 # modelで使用する
 Base = declarative_base()
-# DB接続用のセッションクラス、インスタンスが作成されると接続する
-Base.query = session.query_property()
+
+# セッション依存関係
+def get_db():
+  db = SessionLocal()
+  try:
+    yield db
+  finally:
+    db.close()
