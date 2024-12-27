@@ -6,7 +6,7 @@ from starlette.middleware.cors import CORSMiddleware # CORSを回避するため
 from datetime import timedelta
 from typing import List
 from database.database import get_db  # DBと接続するためのセッション
-from database.models import User, Schedule
+from database.models import User, Schedule, Destination
 from schema import CreateUser, LoginResponse, UserResponse, CreateSchedule, ScheduleResponse
 from crud import create_password_hash, authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_info
 
@@ -73,18 +73,35 @@ async def login (
 # schedule登録処理
 @app.post("/schedules", summary="スケジュール登録", response_model=ScheduleResponse)
 async def create_schedule(
-    schedule: CreateSchedule, 
+    schedule_data: CreateSchedule, 
     db: Session = Depends(get_db),
     create_user: UserResponse = Depends(get_current_user_info)
 ):
+    # スケジュールを作成
     new_schedule = Schedule(
         user_id=create_user.id,
-        date=schedule.date,
-        prefectures=schedule.prefectures,
+        date=schedule_data.date,
+        prefectures=schedule_data.prefectures,
     )
     db.add(new_schedule)
     db.commit()
     db.refresh(new_schedule)
+    
+    # 目的地を登録
+    destinations = []
+    for dest in schedule_data.destinations:
+        new_destination = Destination(
+            schedule_id=new_schedule.id,
+            destination=dest
+        )
+        db.add(new_destination)
+        destinations.append(new_destination)
+    
+    db.commit()
+
+    # リレーションをリフレッシュしてレスポンス用に取得
+    db.refresh(new_schedule)
+
     return new_schedule
 
 # schedule取得処理
@@ -115,8 +132,4 @@ async def delete_schedules(
     db.commit()
 
     return {"status": "Delete Successed"}
-
-# 目的地登録処理
-
-# 目的地更新処理
 
