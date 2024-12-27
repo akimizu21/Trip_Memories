@@ -3,11 +3,13 @@ from fastapi import FastAPI, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware # CORSを回避するために必要
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
+from typing import List
 from database.database import get_db  # DBと接続するためのセッション
 from database.models import User, Schedule
-from schema import CreateUser, Login, CreateSchedule
-from crud.certification_crud import create_password_hash, create_session_id, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, sessions_db
+from schema import CreateUser, LoginResponse, UserResponse, CreateSchedule, ScheduleResponse
+from crud import create_password_hash, authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_info
+
 
 app = FastAPI()
 
@@ -21,10 +23,6 @@ app.add_middleware(
 )
 
 # ------APIの実装--------
-# デモ
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
 
 # user情報を登録
 @app.post("/users", summary="新規登録")
@@ -40,12 +38,11 @@ async def create_user(user: CreateUser, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+    return {"status": "success", "data": new_user}
 
 # ログイン処理  
-@app.post("/login", summary="ログイン")
+@app.post("/login", summary="ログイン", response_model=LoginResponse)
 async def login (
-    response: Response, 
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)    
 ):
@@ -57,38 +54,55 @@ async def login (
           detail="Incorrect username or password",
           headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    # セッションIDの生成と保存
-    session_id = create_session_id()
-    sessions_db[session_id] = user.user_name
+    # アクセストークンを発行
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={'user_name': str(user.user_name)}, expires_delta=access_token_expires)
 
-    # セッションの有効期限を設定
-    expires = datetime.now(tz=timezone.utc) + \
-      timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    response.set_cookie(
-        key="session_id",
-        value=session_id,
-        expires=expires,
-        httponly=True
-    )
     # 成功レスポンス
-    return {"message": "Login successful", "session_id": session_id}
+    return {
+        'status': True,
+        'access_token':  access_token,
+        'message': 'ログインに成功しました',
+        'data':  UserResponse.from_orm(user)  # パスワードを含まないユーザー情報,
+    }
 
-
-    
-
+# ログアウト処理
 
 # user情報変更処理
 
-# トークンでユーザー情報を取得する必要あり
-# # schedule登録処理
-# app.post("/schedules/{user_id}")
-# async def create_schedule(schedule: CreateSchedule, db:Session = Depends(get_db)):
-#     db_schedule = db.query(Schedule)
+# schedule登録処理
+@app.post("/schedules", summary="スケジュール登録", response_model=ScheduleResponse)
+async def create_schedule(
+    schedule: CreateSchedule, 
+    db: Session = Depends(get_db),
+    create_user: UserResponse = Depends(get_current_user_info)
+):
+    new_schedule = Schedule(
+        user_id=create_user.id,
+        date=schedule.date,
+        prefectures=schedule.prefectures,
+    )
+    db.add(new_schedule)
+    db.commit()
+    db.refresh(new_schedule)
+    return new_schedule
 
-#     new_schedule = Schedule(use_id=user_id, date=schedule.date, prefectures=schedule.prefectures)
-#     db.add(new_schedule)
-#     db.commit()
-#     db.refresh(new_schedule)
-#     return new_schedule
+# schedule取得処理
+@app.get("/schedules", summary="スケジュール取得", response_model=List[ScheduleResponse])
+async def get_schedules(
+    db: Session = Depends(get_db),
+    create_user: UserResponse = Depends(get_current_user_info)
+):
+    print(f"Logged in user: {create_user}")  # デバッグ用
+    schedules = db.query(Schedule).where(Schedule.user_id == create_user.id).all()
+
+    return schedules
+
+# schedule更新処理
+
+# schedule削除処理
+
+# 目的地登録処理
+
+# 目的地更新処理
 

@@ -11,4 +11,5 @@ mysqlclient
 itsdangerous
 python-jose[cryptography]
 jose
+PyJWT
 python-multipart

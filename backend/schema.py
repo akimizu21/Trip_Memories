@@ -1,28 +1,52 @@
 from pydantic import BaseModel, EmailStr
-from datetime import datetime
-from typing import Optional
+import datetime
+from typing import Optional, Union
 
-# ユーザーの作成
+# ユーザーの作成(DBへ渡す)
 class CreateUser(BaseModel):
   user_name: str
   email: EmailStr
   password: str
 
 # ユーザー情報
-class User(BaseModel):
-    username: str
-    email: Optional[str] = None
+class LoginUser(BaseModel):
+    id: Optional[int] = None
+    user_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
 
-# ログイン時の取得するユーザー情報
-class UserInDB(User):
-    hashed_password: str
+# レスポンスユーザー
+class UserResponse(BaseModel):
+    id: int
+    user_name: str
+    email: str
 
-# ログイン
-class Login(BaseModel):
-  email: EmailStr
-  password: str
+    class Config:
+        orm_mode = True  # SQLAlchemy モデルを自動変換するため
+        from_attributes = True # from_ormを使用するための設定
 
-# スケジュール作成
+# ログインレスポンスモデル
+class LoginResponse(BaseModel):
+    status: bool
+    access_token: str
+    message: str
+    data: Optional[UserResponse]  # UserResponseはパスワードを含まないモデル
+
+# トークンデータ
+class TokenData(BaseModel):
+  user_name: Optional[str] = None
+
+# スケジュールモデル(DBへ渡す)
 class CreateSchedule(BaseModel):
-  date: str
-  prefectures: str
+   date: datetime.date
+   prefectures: str
+
+# スケジュールレスポンス
+class ScheduleResponse(BaseModel):
+   id: int
+   user_id: int
+   date: datetime.date
+   prefectures: str
+
+   class Config:
+        orm_mode = True
