@@ -15,7 +15,7 @@ import styles from "./page.module.css"
 
 // formで利用する値のtype指定
 interface LoginForm {
-  email: string;
+  name: string;
   password: string;
 };
 
@@ -47,18 +47,18 @@ export default function Login() {
         {/* フォーム領域 */}
         <form onSubmit={handleSubmit(onSubmit)}className={styles.formArea}>
 
-          {/* emailフィールド */}
+          {/* ユーザー名フィールド */}
           <InputField
-            id="email"
-            type="email"
-            placeholder="email"
-            register={register('email', {
+            id="name"
+            type="text"
+            placeholder="ユーザー名"
+            register={register('name', {
               required: {
                 value: true,
-                message: 'メールアドレスを入力してください'
+                message: 'ユーザー名を入力してください'
               },
             })}
-            error={errors.email}
+            error={errors.name}
           />
           {/* パスワードフィールド */}
             <InputField

@@ -9,7 +9,7 @@ class User(Base):
   id = Column(Integer, primary_key=True)
   user_name = Column(String(255), nullable=False)
   email = Column(String(255), unique=True, nullable=False)
-  password = Column(String(255), unique=True, nullable=False)
+  password = Column(String(255), nullable=False)
 
   # ユーザーが持つスケジュールのリレーション
   schedules = relationship("Schedule", back_populates="user", cascade="all, delete-orphan")

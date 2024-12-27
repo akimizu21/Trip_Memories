@@ -2,3 +2,13 @@ uvicorn
 fastapi
 mysqlclient
 sqlalchemy
+pytz
+python-dotenv
+pydantic
+pydantic[email]
+passlib[bcrypt]
+mysqlclient
+itsdangerous
+python-jose[cryptography]
+jose
+python-multipart
