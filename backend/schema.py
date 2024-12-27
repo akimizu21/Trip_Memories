@@ -8,13 +8,6 @@ class CreateUser(BaseModel):
   email: EmailStr
   password: str
 
-# ユーザー情報
-class LoginUser(BaseModel):
-    id: Optional[int] = None
-    user_name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
-
 # レスポンスユーザー
 class UserResponse(BaseModel):
     id: int

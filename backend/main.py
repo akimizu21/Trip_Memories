@@ -93,7 +93,6 @@ async def get_schedules(
     db: Session = Depends(get_db),
     create_user: UserResponse = Depends(get_current_user_info)
 ):
-    print(f"Logged in user: {create_user}")  # デバッグ用
     schedules = db.query(Schedule).where(Schedule.user_id == create_user.id).all()
 
     return schedules
@@ -101,6 +100,21 @@ async def get_schedules(
 # schedule更新処理
 
 # schedule削除処理
+@app.delete("/schedules/{schedule_id}", summary="スケジュール削除")
+async def delete_schedules(
+    schedule_id: int,
+    db: Session = Depends(get_db),
+    create_user: UserResponse = Depends(get_current_user_info)
+):
+    del_schedule = db.query(Schedule).filter(Schedule.id == schedule_id, Schedule.user_id == create_user.id).first()
+
+    if del_schedule is None:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    
+    db.delete(del_schedule)
+    db.commit()
+
+    return {"status": "Delete Successed"}
 
 # 目的地登録処理
 
