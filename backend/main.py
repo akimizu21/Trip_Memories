@@ -67,6 +67,15 @@ async def login (
     }
 
 # ログアウト処理
+@app.post("/logout", summary="ログアウト", response_model=None)
+def logout(response: Response):
+    # クライアント側のクッキー削除
+    response.delete_cookie("access_token")
+
+    # サーバー側でトークンを無効化（例: トークンをブラックリストに追加する処理など）
+    # blacklisted_tokens.add(access_token) のような仕組みを構築する
+    
+    return {"state": "ログアウトに成功しました"}
 
 # user情報変更処理
 
@@ -131,5 +140,5 @@ async def delete_schedules(
     db.delete(del_schedule)
     db.commit()
 
-    return {"status": "Delete Successed"}
+    return {"status": "予定を削除しました"}
 
