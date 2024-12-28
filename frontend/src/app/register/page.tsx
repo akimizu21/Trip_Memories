@@ -16,7 +16,7 @@ import styles from "./page.module.css"
 
 // formで利用する値のtype指定
 interface RegisterForm {
-  name: string;
+  user_name: string;
   email: string;
   password1: string;
   password2: string;
@@ -37,9 +37,42 @@ export default function Register() {
     // 新規登録ボタンを押したときのみバリデーションを行う
     reValidateMode: 'onSubmit',
   });
-
-  const onSubmit: SubmitHandler<RegisterForm> = (data) => {
+ 
+  /**
+   * データ送信処理
+   * @param data 
+   */
+  const onUserSubmit: SubmitHandler<RegisterForm> = async (data) => {
     console.log(data);
+    try {
+      const response = await fetch("http://localhost:8080/users", {
+        method: "POST",
+        headers: {
+          // サーバーへ送るファイルはJSONファイルであることを宣言
+          'Content-Type': 'application/json',
+        },
+        // 送るデータをjson形式に変換
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add User');
+      }
+
+      // レスポンスデータを取得
+      const responseData = await response.json();
+      console.log("Successfully added User:", responseData);
+
+      // サーバーからリダイレクトURLを受け取る
+      if (responseData.redirect_url) {
+        window.location.href = responseData.redirect_url;
+      } else {
+        console.error("Redirect URL not provided");
+      }
+    } catch (error) {
+      console.error('Error adding User:', error);
+      throw error;
+    }
   };
 
   // パスワード1の値をリアルタイムで取得
@@ -51,20 +84,20 @@ export default function Register() {
         <h1>新規登録フォーム</h1>
 
         {/* フォーム領域 */}  
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.formArea}>
+        <form onSubmit={handleSubmit(onUserSubmit)} className={styles.formArea}>
           <div className={styles.inputArea}>
             {/* ユーザー名フィールド */}
             <InputField 
-              id="name"
+              id="user_name"
               type="text"
               placeholder="ユーザー名"
-              register={register('name', {
+              register={register('user_name', {
                 required: {
                   value: true,
                   message: 'ユーザー名を入力してください',
                 },
               })}
-              error={errors.name}
+              error={errors.user_name}
             />
           </div>
           {/* emailフィールド */}

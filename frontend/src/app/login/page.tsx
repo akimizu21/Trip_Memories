@@ -15,7 +15,7 @@ import styles from "./page.module.css"
 
 // formで利用する値のtype指定
 interface LoginForm {
-  name: string;
+  user_name: string;
   password: string;
 };
 
@@ -34,8 +34,45 @@ export default function Login() {
     reValidateMode: 'onSubmit',
   });
 
-  const onSubmit: SubmitHandler<LoginForm> = (data) => {
+  /**
+   * ログイン情報送信処理
+   * @param data 
+   */
+  const onLoginSubmit: SubmitHandler<LoginForm> = async (data) => { 
     console.log(data);
+    try {
+      const response = await fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: {
+          // FastAPIのログインエンドポイントが OAuth2PasswordRequestForm を使用
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        // 送るデータを指定
+        body: new URLSearchParams({
+          username: data.user_name,
+          password: data.password,
+        }),
+        credentials: "include", // クッキーを含める
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add User');
+      }
+
+      // レスポンスデータを取得
+      const responseData = await response.json();
+      console.log("Successfully added User:", responseData);
+
+      // // サーバーからリダイレクトURLを受け取る
+      if (responseData.redirect_url) {
+        window.location.href = responseData.redirect_url;
+      } else {
+        console.error("Redirect URL not provided");
+      }
+    } catch (error) {
+      console.error('Error adding User:', error);
+      throw error;
+    }
   };
 
   return (
@@ -45,20 +82,20 @@ export default function Login() {
         <h1>画像表示</h1>
 
         {/* フォーム領域 */}
-        <form onSubmit={handleSubmit(onSubmit)}className={styles.formArea}>
+        <form onSubmit={handleSubmit(onLoginSubmit)}className={styles.formArea}>
 
           {/* ユーザー名フィールド */}
           <InputField
-            id="name"
+            id="user_name"
             type="text"
             placeholder="ユーザー名"
-            register={register('name', {
+            register={register('user_name', {
               required: {
                 value: true,
                 message: 'ユーザー名を入力してください'
               },
             })}
-            error={errors.name}
+            error={errors.user_name}
           />
           {/* パスワードフィールド */}
             <InputField

@@ -1,6 +1,7 @@
 
 from fastapi import FastAPI, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware # CORSを回避するために必要
 from datetime import timedelta
@@ -16,7 +17,7 @@ app = FastAPI()
 # CORSを回避するために設定
 app.add_middleware(
   CORSMiddleware,
-  allow_origins=["*"],
+  allow_origins=["*"], # NginxのURLを許可
   allow_credentials=True,
   allow_methods=["*"],
   allow_headers=["*"],  
@@ -32,13 +33,14 @@ async def create_user(user: CreateUser, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     # パスワードのハッシュ化
-    hashed_password = create_password_hash(user.password)
+    hashed_password = create_password_hash(user.password1)
 
     new_user = User(user_name=user.user_name, email=user.email, password=hashed_password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return {"status": "success", "data": new_user}
+
+    return {"status": "success", "redirect_url": "http://localhost/login"}
 
 # ログイン処理  
 @app.post("/login", summary="ログイン", response_model=LoginResponse)
@@ -58,13 +60,21 @@ async def login (
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={'user_name': str(user.user_name)}, expires_delta=access_token_expires)
 
-    # 成功レスポンス
-    return {
-        'status': True,
-        'access_token':  access_token,
-        'message': 'ログインに成功しました',
-        'data':  UserResponse.from_orm(user)  # パスワードを含まないユーザー情報,
-    }
+    # クッキーにアクセストークンを設定
+    response = JSONResponse(
+        content={
+            "status": "success",
+            "redirect_url": "http://localhost/"
+        }
+    )
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {access_token}",
+        httponly=True,
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+
+    return response
 
 # ログアウト処理
 @app.post("/logout", summary="ログアウト", response_model=None)

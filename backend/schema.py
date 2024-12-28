@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, model_validator
 import datetime
 from typing import Optional, List
 
@@ -6,7 +6,16 @@ from typing import Optional, List
 class CreateUser(BaseModel):
   user_name: str
   email: EmailStr
-  password: str
+  password1: str
+  password2: str
+
+  # パスワードの一致チェック
+  @model_validator(mode="after")
+  def check_passwords_match(cls, values):
+      if values.password1 != values.password2:
+          raise ValueError("Passwords do not match")
+      return values
+      
 
 # レスポンスユーザー
 class UserResponse(BaseModel):
@@ -34,7 +43,6 @@ class CreateSchedule(BaseModel):
    date: datetime.date
    prefectures: str
    destinations: List[str] = Field(..., max_itme=3)
-
 
 # 目的地のレスポンス
 class DestinationResponse(BaseModel):
