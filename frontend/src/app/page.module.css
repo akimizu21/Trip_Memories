@@ -21,6 +21,7 @@
   flex-direction: column;
   text-decoration: none;
   color: #000;
+  cursor: pointer;
 }
 
 .logoutArea:hover {

@@ -48,7 +48,7 @@ export default function Register() {
       const response = await fetch("http://localhost:8080/users", {
         method: "POST",
         headers: {
-          // サーバーへ送るファイルはJSONファイルであることを宣言
+          // 
           'Content-Type': 'application/json',
         },
         // 送るデータをjson形式に変換
@@ -67,7 +67,7 @@ export default function Register() {
       if (responseData.redirect_url) {
         window.location.href = responseData.redirect_url;
       } else {
-        console.error("Redirect URL not provided");
+        console.log("Redirect URL not provided")
       }
     } catch (error) {
       console.error('Error adding User:', error);

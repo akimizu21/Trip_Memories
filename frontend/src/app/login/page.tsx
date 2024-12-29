@@ -63,15 +63,14 @@ export default function Login() {
       const responseData = await response.json();
       console.log("Successfully added User:", responseData);
 
-      // // サーバーからリダイレクトURLを受け取る
       if (responseData.redirect_url) {
-        window.location.href = responseData.redirect_url;
+        window.location.href = responseData.redirect_url; // クライアント側でリダイレクト
       } else {
         console.error("Redirect URL not provided");
       }
     } catch (error) {
       console.error('Error adding User:', error);
-      throw error;
+      alert("ログインに失敗しました");
     }
   };
 

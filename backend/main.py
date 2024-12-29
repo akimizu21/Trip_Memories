@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware # CORSを回避するために必要
 from datetime import timedelta
@@ -14,16 +14,28 @@ from crud import create_password_hash, authenticate_user, create_access_token, A
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "null"
+]
+
 # CORSを回避するために設定
 app.add_middleware(
   CORSMiddleware,
-  allow_origins=["*"], # NginxのURLを許可
+  allow_origins=origins, # NginxのURLを許可
   allow_credentials=True,
   allow_methods=["*"],
   allow_headers=["*"],  
 )
 
 # ------APIの実装--------
+
+# リダイレクト用テスト
+@app.get("/test")
+async def redirect_page():
+    return RedirectResponse("http://localhost/login")
 
 # user情報を登録
 @app.post("/users", summary="新規登録")
@@ -40,13 +52,13 @@ async def create_user(user: CreateUser, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return {"status": "success", "redirect_url": "http://localhost/login"}
+    return {"state": "success", "redirect_url": "http://localhost/login"}
 
 # ログイン処理  
 @app.post("/login", summary="ログイン", response_model=LoginResponse)
 async def login (
     form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)    
+    db: Session = Depends(get_db)
 ):
     # データベースを使ったユーザー認証
     user = authenticate_user(db, form_data.username, form_data.password)
@@ -64,7 +76,7 @@ async def login (
     response = JSONResponse(
         content={
             "status": "success",
-            "redirect_url": "http://localhost/"
+            "redirect_url": "http://localhost/"  # ダッシュボードのURL
         }
     )
     response.set_cookie(
@@ -81,11 +93,8 @@ async def login (
 def logout(response: Response):
     # クライアント側のクッキー削除
     response.delete_cookie("access_token")
-
-    # サーバー側でトークンを無効化（例: トークンをブラックリストに追加する処理など）
-    # blacklisted_tokens.add(access_token) のような仕組みを構築する
     
-    return {"state": "ログアウトに成功しました"}
+    return {"state": "success", "redirect_url": "http://localhost/login"}
 
 # user情報変更処理
 
@@ -96,6 +105,9 @@ async def create_schedule(
     db: Session = Depends(get_db),
     create_user: UserResponse = Depends(get_current_user_info)
 ):
+    if not create_user:  # ユーザーが認証されているか確認
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     # スケジュールを作成
     new_schedule = Schedule(
         user_id=create_user.id,

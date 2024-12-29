@@ -29,6 +29,19 @@ interface Props {
 export const ScheduleModal = (props: Props) => {
   const {isScheduleModalOpnen, handleCloseScheduleModal} = props
 
+  /**
+   * アクセストークン取得処理
+   * @returns 
+   */
+  const getAccessTokenFromCookie = () => {
+    const cookies = document.cookie.split(";");
+    const accessTokenCookie = cookies.find(cookie => cookie.startsWith("access_token="));
+    if (accessTokenCookie) {
+      return accessTokenCookie.split("=")[1];
+    }
+    return null;
+  }
+
   // カスタムフックの指定
   const {
     register,
@@ -45,10 +58,48 @@ export const ScheduleModal = (props: Props) => {
    * データ送信処理
    * @param data 
    */
-  const onSubmit: SubmitHandler<ScheduleForm> = (data) => {
-      console.log(data);
-      reset();
-      handleCloseScheduleModal();
+  const onSheduleSubmit: SubmitHandler<ScheduleForm> = async (data) => {
+    // アクセストークンを取得
+    const accessToken = getAccessTokenFromCookie();
+    console.log("accsesstoken :", accessToken);
+
+    // 目的地をリスト形式に変換
+    const destinations = [
+      data.destination1,
+      data.destination2,
+      data.destination3
+    ].filter(Boolean); // 空の目的地を除外
+
+    const payload = {
+      date: new Date(data.date).toISOString().split("T")[0], // YYYY-MM-DD形式
+      prefectures: data.prefectures,
+      destinations,
+    };
+
+    console.log(payload);
+
+    try {
+      const response = await fetch("http://localhost:8080/schedules", {
+        method: "POST",
+        headers: {
+          // サーバーへ送るファイルはJSONファイルであることを宣言
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`, // トークンを設定
+        },
+        // 送るデータをjson形式に変換
+        body: JSON.stringify(payload),
+        credentials: 'include',
+      });
+      
+      if(!response.ok) {
+        throw new Error('Failed to add schedule');
+      }
+    } catch (error) {
+      console.error('Error adding schedule:', error);
+      throw error;
+    }
+    reset();
+    handleCloseScheduleModal();
   };
   
   if (!isScheduleModalOpnen) {
@@ -60,7 +111,7 @@ export const ScheduleModal = (props: Props) => {
       <h1>予定を追加</h1>
 
       {/* フォーム領域 */}  
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.formArea}>
+      <form onSubmit={handleSubmit(onSheduleSubmit)} className={styles.formArea}>
         {/* 日時フィールド */}
         <div className={styles.inputArea}>
           <InputField 

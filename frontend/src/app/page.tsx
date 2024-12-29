@@ -44,6 +44,38 @@ export default function Home() {
     setIsScheduleModalOpne((isScheduleModalOpnen) => !isScheduleModalOpnen);
   };
 
+  /**
+   * Logout処理
+   */
+  const onLogoutSbumit = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/logout", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: "include", // クッキーを送信
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add User');
+      }
+
+      // レスポンスデータを取得
+      const responseData = await response.json();
+      console.log("Successfully added User:", responseData);
+
+      // サーバーからリダイレクトURLを受け取る
+      if (responseData.redirect_url) {
+        window.location.href = responseData.redirect_url;
+      } else {
+        console.error("Redirect URL not provided");
+      }
+    } catch (error) {
+      console.error('Error adding User:', error);
+      throw error;
+    }
+  }
 
   return (
     <>
@@ -57,10 +89,10 @@ export default function Home() {
             isEditModalOpen={isEditModalOpen}
             handleCloseEditModal={handleCloseEditModal}
           />
-          <Link href={"/login"} className={styles.logoutArea}>
+          <div className={styles.logoutArea} onClick={onLogoutSbumit}>
               <FontAwesomeIcon icon={faRightFromBracket} className={styles.far} />
               <p>logout</p>
-          </Link>
+          </div>
         </section>
       {/* ボタン表示領域 */}
       <section className={styles.buttonArea}>

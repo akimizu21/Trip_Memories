@@ -13,6 +13,8 @@ services:
       dockerfile: docker/python/Dockerfile
     ports:
       - 8080:8080
+    networks:
+      - app_network
 
   frontend:
     # コンテナ名をfrontendに設定
@@ -29,6 +31,8 @@ services:
       - "3000:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true # ファイル監視を有効化
+    networks:
+      - app_network
     
   nginx:
     image: nginx:latest
@@ -36,6 +40,8 @@ services:
       - "80:80"
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - app_network
 
   db:
     container_name: MySQL
@@ -64,6 +70,12 @@ services:
       retries: 3
       # ヘルスチェックが失敗しても無視する時間は30秒
       start_period: 30s
+    networks:
+      - app_network
 
 volumes:
   mysql_data:
+
+networks:
+  app_network:
+    driver: bridge
