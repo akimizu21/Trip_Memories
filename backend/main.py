@@ -9,7 +9,7 @@ from typing import List
 from database.database import get_db  # DBと接続するためのセッション
 from database.models import User, Schedule, Destination
 from schema import CreateUser, LoginResponse, UserResponse, CreateSchedule, ScheduleResponse
-from crud import create_password_hash, authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_info
+from crud import create_password_hash, authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_info, get_current_user_from_cookie
 
 
 app = FastAPI()
@@ -76,7 +76,9 @@ async def login (
     response = JSONResponse(
         content={
             "status": "success",
-            "redirect_url": "http://localhost/"  # ダッシュボードのURL
+            "redirect_url": "http://localhost/",  # ダッシュボードのURL
+            "access_token": access_token, # トークンをレスポンスボディに含める
+            "token_type": "bearer" # トークンタイプも明示
         }
     )
     response.set_cookie(
@@ -103,7 +105,7 @@ def logout(response: Response):
 async def create_schedule(
     schedule_data: CreateSchedule, 
     db: Session = Depends(get_db),
-    create_user: UserResponse = Depends(get_current_user_info)
+    create_user: UserResponse = Depends(get_current_user_from_cookie)
 ):
     if not create_user:  # ユーザーが認証されているか確認
         raise HTTPException(status_code=401, detail="Unauthorized")

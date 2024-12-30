@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta, timezone
 import secrets
-import jwt
+from jose import jwt, JWTError
 from jwt import InvalidTokenError
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from typing import Optional, Union
@@ -88,4 +88,37 @@ async def get_current_user_info(
     current_user: UserResponse = Depends(get_current_user_wrapper),
 ):
     return current_user
+
+# Cookie からトークンを取得
+async def get_current_user_from_cookie(request: Request, db: Session = Depends(get_db)):
+    cookie_token = request.cookies.get("access_token")
+    if not cookie_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
+
+    # "Bearer " プレフィックスを削除
+    token = cookie_token.replace("Bearer ", "")
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("user_name")
+        if username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+            )
+        # DBからユーザーを取得
+        user = db.query(User).filter(User.user_name == username).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+            )
+        return user
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
 

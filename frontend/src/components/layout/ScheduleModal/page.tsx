@@ -29,19 +29,6 @@ interface Props {
 export const ScheduleModal = (props: Props) => {
   const {isScheduleModalOpnen, handleCloseScheduleModal} = props
 
-  /**
-   * アクセストークン取得処理
-   * @returns 
-   */
-  const getAccessTokenFromCookie = () => {
-    const cookies = document.cookie.split(";");
-    const accessTokenCookie = cookies.find(cookie => cookie.startsWith("access_token="));
-    if (accessTokenCookie) {
-      return accessTokenCookie.split("=")[1];
-    }
-    return null;
-  }
-
   // カスタムフックの指定
   const {
     register,
@@ -59,9 +46,6 @@ export const ScheduleModal = (props: Props) => {
    * @param data 
    */
   const onSheduleSubmit: SubmitHandler<ScheduleForm> = async (data) => {
-    // アクセストークンを取得
-    const accessToken = getAccessTokenFromCookie();
-    console.log("accsesstoken :", accessToken);
 
     // 目的地をリスト形式に変換
     const destinations = [
@@ -84,7 +68,6 @@ export const ScheduleModal = (props: Props) => {
         headers: {
           // サーバーへ送るファイルはJSONファイルであることを宣言
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`, // トークンを設定
         },
         // 送るデータをjson形式に変換
         body: JSON.stringify(payload),
