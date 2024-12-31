@@ -45,7 +45,7 @@ export const ScheduleModal = (props: Props) => {
    * データ送信処理
    * @param data 
    */
-  const onSheduleSubmit: SubmitHandler<ScheduleForm> = async (data) => {
+  const handlePostSchedule: SubmitHandler<ScheduleForm> = async (data) => {
 
     // 目的地をリスト形式に変換
     const destinations = [
@@ -94,7 +94,7 @@ export const ScheduleModal = (props: Props) => {
       <h1>予定を追加</h1>
 
       {/* フォーム領域 */}  
-      <form onSubmit={handleSubmit(onSheduleSubmit)} className={styles.formArea}>
+      <form onSubmit={handleSubmit(handlePostSchedule)} className={styles.formArea}>
         {/* 日時フィールド */}
         <div className={styles.inputArea}>
           <InputField 

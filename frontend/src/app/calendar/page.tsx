@@ -3,7 +3,7 @@
 /**
  * Calendar
  */
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import Link from "next/link"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faPen, faX } from '@fortawesome/free-solid-svg-icons';
@@ -38,6 +38,8 @@ export default function Calendar() {
   const [scheduleList, setScheduleList] = React.useState<Schedule[]>([]);
   // モーダル開閉を管理
   const [isSheduleEditModalOpen, setIsSheduleEditModalOpen] = React.useState(false);
+  // カレンダーイベントの状態
+  const [events, setEvents] = React.useState<{ title: string; date: string}[]>([]);
 
   /**
    * スケジュールをDBから取得
@@ -50,10 +52,17 @@ export default function Calendar() {
           credentials: "include",
         })
         const rawData = await response.json();
-        console.log(rawData);
+
         const transformedData = transformServerData(rawData);
-        console.log(transformedData);
-        setScheduleList(transformedData);
+
+        // 日付順に並び替え
+        const sorteData = transformedData.sort((a, b) => {
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        });
+
+        console.log(sorteData);
+
+        setScheduleList(sorteData);
       } catch (error) {
         console.error('Failed to fetch schedules:', error);
       };
@@ -62,10 +71,40 @@ export default function Calendar() {
   }, []);
 
   /**
+   * scheduleList が更新されたときに events を再計算
+   */
+  React.useEffect (() => {
+    const updateEvents = scheduleList.map((schedule) => ({
+      title: schedule.prefectures,
+      date: schedule.date,
+    }));
+    setEvents(updateEvents);
+    console.log(events);
+  },[scheduleList]); // scheduleList が更新されたときに再実行
+
+  /**
    * モーダル開閉処理
    */
   const handleCloseSheduleEditModal = () => {
     setIsSheduleEditModalOpen((isSheduleEditModalOpen) => !isSheduleEditModalOpen);
+  }
+
+  /**
+   * DBからスケジュールを削除する処理
+   * @param targetId 
+   */
+  const handleDeleteScheduleRequest = async (targetId: number) => {
+    fetch (`http://localhost:8080/schedules/${targetId}`, {
+      method: "DELETE",
+      credentials: "include"
+    })
+    .then(respnse => respnse.json())
+    .then(data => {
+      console.log("Succsess", data);
+    })
+    .catch((error) => {
+      console.error("Error", error)
+    })
   }
 
   /**
@@ -79,18 +118,11 @@ export default function Calendar() {
         return schedule.id !== targetId;
       });
       setScheduleList(newScheduleList);
+
+      // サーバーへ削除を送信
+      handleDeleteScheduleRequest(targetId);
     }
   };
-
-  /**
-   * カレンダーのイベントに入れる
-   */
-  const events = scheduleList.map((schedule) => (
-    {
-      title: schedule.prefectures,
-      date: schedule.date,
-    }
-  ));
 
   return (
     <>
@@ -126,7 +158,7 @@ export default function Calendar() {
                   {/* スケジュールの都道府県名と日程 */}
                   <span className={styels.scheduleTitle}>
                     <p>旅先 : {schedule.prefectures}</p>
-                    <p>旅行日程 : {schedule.date}</p>
+                    <p>日程 : {schedule.date}</p>
                   </span>
                   {/* スケジュールの目的地 */}
                   <ul className={styels.destinations}>

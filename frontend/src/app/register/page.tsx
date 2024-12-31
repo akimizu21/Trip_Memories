@@ -42,7 +42,7 @@ export default function Register() {
    * データ送信処理
    * @param data 
    */
-  const onUserSubmit: SubmitHandler<RegisterForm> = async (data) => {
+  const handlePostUser: SubmitHandler<RegisterForm> = async (data) => {
     console.log(data);
     try {
       const response = await fetch("http://localhost:8080/users", {
@@ -84,7 +84,7 @@ export default function Register() {
         <h1>新規登録フォーム</h1>
 
         {/* フォーム領域 */}  
-        <form onSubmit={handleSubmit(onUserSubmit)} className={styles.formArea}>
+        <form onSubmit={handleSubmit(handlePostUser)} className={styles.formArea}>
           <div className={styles.inputArea}>
             {/* ユーザー名フィールド */}
             <InputField 

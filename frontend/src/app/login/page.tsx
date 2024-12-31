@@ -38,7 +38,7 @@ export default function Login() {
    * ログイン情報送信処理
    * @param data 
    */
-  const onLoginSubmit: SubmitHandler<LoginForm> = async (data) => { 
+  const handlePostLogin: SubmitHandler<LoginForm> = async (data) => { 
     console.log(data);
     try {
       const response = await fetch("http://localhost:8080/login", {
@@ -81,7 +81,7 @@ export default function Login() {
         <h1>画像表示</h1>
 
         {/* フォーム領域 */}
-        <form onSubmit={handleSubmit(onLoginSubmit)}className={styles.formArea}>
+        <form onSubmit={handleSubmit(handlePostLogin)}className={styles.formArea}>
 
           {/* ユーザー名フィールド */}
           <InputField
