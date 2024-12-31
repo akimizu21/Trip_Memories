@@ -3,14 +3,14 @@
 /**
  * Calendar
  */
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faPen, faX } from '@fortawesome/free-solid-svg-icons';
 /**
  * data
  */
-import { INIT_SCHEDULE_LIST } from "@/constants/data";
+import { Schedule, transformServerData } from "@/constants/data";
 /**
  * componetnts
  */
@@ -35,9 +35,31 @@ export default function Calendar() {
     "Saturday"][today.getDay()];
 
   // スケジュールリスト
-  const [scheduleList, setScheduleList] = React.useState(INIT_SCHEDULE_LIST);
+  const [scheduleList, setScheduleList] = React.useState<Schedule[]>([]);
   // モーダル開閉を管理
   const [isSheduleEditModalOpen, setIsSheduleEditModalOpen] = React.useState(false);
+
+  /**
+   * スケジュールをDBから取得
+   */
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/schedules", {
+          method: "GET",
+          credentials: "include",
+        })
+        const rawData = await response.json();
+        console.log(rawData);
+        const transformedData = transformServerData(rawData);
+        console.log(transformedData);
+        setScheduleList(transformedData);
+      } catch (error) {
+        console.error('Failed to fetch schedules:', error);
+      };
+    }
+    fetchSchedules();
+  }, []);
 
   /**
    * モーダル開閉処理
@@ -92,7 +114,7 @@ export default function Calendar() {
       <section className={styels.scheduleArea}>
         {/* 日時表示エリア */}
         <div className={styels.dateArea}>
-          <p className={styels.date}>{today.getFullYear()}.{today.getMonth() + 1}.{today.getDate()}</p>
+          <p className={styels.date}>Today : {today.getFullYear()}.{today.getMonth() + 1}.{today.getDate()}</p>
           <p className={styels.date}>{weekdays}</p>
         </div>
         {/* 予定カード表示エリア */}
@@ -101,8 +123,11 @@ export default function Calendar() {
             return (
               <li className={styels.scheduleCard} key={schedule.id}>
                 <div>
-                  {/* スケジュールの都道府県名 */}
-                  <span className={styels.scheduleTitle}>旅先 : {schedule.prefectures}</span>
+                  {/* スケジュールの都道府県名と日程 */}
+                  <span className={styels.scheduleTitle}>
+                    <p>旅先 : {schedule.prefectures}</p>
+                    <p>旅行日程 : {schedule.date}</p>
+                  </span>
                   {/* スケジュールの目的地 */}
                   <ul className={styels.destinations}>
                     <li className={styels.destination}>目的地1 : {schedule.destination1}</li>

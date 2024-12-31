@@ -141,7 +141,7 @@ async def create_schedule(
 @app.get("/schedules", summary="スケジュール取得", response_model=List[ScheduleResponse])
 async def get_schedules(
     db: Session = Depends(get_db),
-    create_user: UserResponse = Depends(get_current_user_info)
+    create_user: UserResponse = Depends(get_current_user_from_cookie)
 ):
     schedules = db.query(Schedule).where(Schedule.user_id == create_user.id).all()
 
@@ -154,7 +154,7 @@ async def get_schedules(
 async def delete_schedules(
     schedule_id: int,
     db: Session = Depends(get_db),
-    create_user: UserResponse = Depends(get_current_user_info)
+    create_user: UserResponse = Depends(get_current_user_from_cookie)
 ):
     del_schedule = db.query(Schedule).filter(Schedule.id == schedule_id, Schedule.user_id == create_user.id).first()
 
