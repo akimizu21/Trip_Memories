@@ -24,10 +24,11 @@ interface ScheduleForm {
 interface Props {
   isScheduleModalOpnen: boolean;
   handleCloseScheduleModal: () => void;
+  fetchSchedules: () => Promise<void>
 }
 
 export const ScheduleModal = (props: Props) => {
-  const {isScheduleModalOpnen, handleCloseScheduleModal} = props
+  const {isScheduleModalOpnen, handleCloseScheduleModal, fetchSchedules} = props
 
   // カスタムフックの指定
   const {
@@ -46,7 +47,6 @@ export const ScheduleModal = (props: Props) => {
    * @param data 
    */
   const handlePostSchedule: SubmitHandler<ScheduleForm> = async (data) => {
-
     // 目的地をリスト形式に変換
     const destinations = [
       data.destination1,
@@ -77,12 +77,13 @@ export const ScheduleModal = (props: Props) => {
       if(!response.ok) {
         throw new Error('Failed to add schedule');
       }
+      await fetchSchedules();
+      reset();
+      handleCloseScheduleModal();
     } catch (error) {
       console.error('Error adding schedule:', error);
       throw error;
     }
-    reset();
-    handleCloseScheduleModal();
   };
   
   if (!isScheduleModalOpnen) {

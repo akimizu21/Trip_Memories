@@ -9,7 +9,11 @@ import {
   faPenToSquare,
   faRightFromBracket,
 } from '@fortawesome/free-solid-svg-icons';
-
+/**
+ * data
+ */
+import { Schedule, transformServerData } from "@/constants/data";
+/**
 /**
  * componens
  */
@@ -29,6 +33,55 @@ export default function Home() {
   // モーダルの開閉処理を管理
   const [isEditModalOpen, setIsEditModalOpne] = React.useState(false);
   const [isScheduleModalOpnen, setIsScheduleModalOpne] = React.useState(false);
+  // スケジュールデータ
+  const [scheduleList, setScheduleList] = React.useState<Schedule[]>([]);
+  // ラベルデータ
+  const [labelData, setLabelData] = React.useState<string[]>([]);
+  // 回数データ
+  const [countData, setCountData] = React.useState<number[]>([]);
+
+  /**
+   * スケジュールをDBから取得
+   */
+  const fetchSchedules = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/schedules", {
+        method: "GET",
+        credentials: "include",
+      })
+      const rawData = await response.json();
+      const transformedData = transformServerData(rawData);
+
+      setScheduleList(transformedData);
+    } catch (error) {
+      console.error('Failed to fetch schedules:', error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchSchedules(); // 初回レンダリング時にデータを取得
+  }, []);
+
+  /**
+   * 最新のラベルを取得
+   */
+  React.useEffect (() => {
+    const updateLabelsAndData = () => {
+      const uniqueLabels  = Array.from(
+        new Set(scheduleList.map((itme) => itme.prefectures))
+      );
+
+      // 各ラベルの出現回数を計算
+      const counts = uniqueLabels.map((label) => 
+        scheduleList.filter((item) => item.prefectures === label).length
+      );
+  
+      setLabelData(uniqueLabels);
+      setCountData(counts);
+    };
+
+    updateLabelsAndData();
+  },[scheduleList]); // scheduleList が更新されたときに再実行
   
   /**
    * エディットモーダル開閉処理
@@ -100,6 +153,7 @@ export default function Home() {
         <ScheduleModal
           isScheduleModalOpnen={isScheduleModalOpnen}
           handleCloseScheduleModal={handleCloseScheduleModal}
+          fetchSchedules={fetchSchedules}
         />
         <Link href={"calendar"} className={styles.showButton}>
           予定を表示
@@ -110,8 +164,8 @@ export default function Home() {
           <h2>旅行の軌跡</h2>
           <div className={styles.showMap}>地図を表示</div>
           <BarChart
-            labels={labels}
-            data={data1}
+            labels={labelData}
+            data={countData}
           />
         </section>
     </>

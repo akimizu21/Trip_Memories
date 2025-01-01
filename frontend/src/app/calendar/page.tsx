@@ -3,7 +3,7 @@
 /**
  * Calendar
  */
-import React, { use, useEffect } from "react";
+import React from "react";
 import Link from "next/link"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faPen, faX } from '@fortawesome/free-solid-svg-icons';
@@ -44,7 +44,7 @@ export default function Calendar() {
   /**
    * スケジュールをDBから取得
    */
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchSchedules = async () => {
       try {
         const response = await fetch("http://localhost:8080/schedules", {
