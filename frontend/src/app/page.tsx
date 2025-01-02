@@ -58,8 +58,9 @@ export default function Home() {
     }
   };
 
+  // 初回レンダリング時にデータを取得
   React.useEffect(() => {
-    fetchSchedules(); // 初回レンダリング時にデータを取得
+    fetchSchedules();
   }, []);
 
   /**

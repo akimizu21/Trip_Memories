@@ -22,12 +22,14 @@ interface ScheduleEditForm {
 };
 
 interface Props {
-  isSheduleEditModalOpen: boolean;
-  handleCloseSheduleEditModal: () => void;
+  scheduleEditModalState: boolean;
+  handleCloseScheduleEditModal: () => void;
+  targetId: number | null;
+  fetchSchedules: () => void;
 }
 
 export const ScheduleEditModal = (props: Props) => {
-  const {isSheduleEditModalOpen, handleCloseSheduleEditModal} = props
+  const {scheduleEditModalState, handleCloseScheduleEditModal, targetId, fetchSchedules} = props
 
   // カスタムフックの指定
     const {
@@ -46,13 +48,49 @@ export const ScheduleEditModal = (props: Props) => {
    * データ送信処理
    * @param data 
    */
-  const onSubmit: SubmitHandler<ScheduleEditForm> = (data) => {
-    console.log(data);
-    reset();
-    handleCloseSheduleEditModal();
+  const handlePostEditSchedule: SubmitHandler<ScheduleEditForm> = async (data) => {
+    // 目的地をリスト形式に変換
+    const destinations = [
+      data.destination1,
+      data.destination2,
+      data.destination3
+    ].filter(Boolean); // 空の目的地を除外
+
+    const payload = {
+      date: new Date(data.date).toISOString().split("T")[0], // YYYY-MM-DD形式
+      prefectures: data.prefectures,
+      destinations,
+    };
+  
+    console.log(payload);
+    console.log(targetId)
+
+    try {
+      const response = await fetch(`http://localhost:8080/schedules/${targetId}`, {
+        method: "POST",
+        headers: {
+          // サーバーへ送るファイルはJSONファイルであることを宣言
+          'Content-Type': 'application/json',
+        },
+        // 送るデータをjson形式に変換
+        body: JSON.stringify(payload),
+        credentials: 'include',
+      });
+
+      if(!response.ok) {
+        throw new Error('Failed to add schedule');
+      }
+      
+      fetchSchedules();
+      reset();
+      handleCloseScheduleEditModal();
+    } catch (error) {
+      console.error('Error adding schedule:', error);
+      throw error;
+    }
   };
 
-  if (!isSheduleEditModalOpen) {
+  if (!scheduleEditModalState) {
     return <></>
   }
 
@@ -61,7 +99,7 @@ export const ScheduleEditModal = (props: Props) => {
       <h1>予定を追加</h1>
 
       {/* フォーム領域 */}  
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.formArea}>
+      <form onSubmit={handleSubmit(handlePostEditSchedule)} className={styles.formArea}>
         {/* 日時フィールド */}
         <div className={styles.inputArea}>
           <InputField 
@@ -113,7 +151,7 @@ export const ScheduleEditModal = (props: Props) => {
             変更
           </button>
           {/* 戻るボタン */}
-          <div onClick={handleCloseSheduleEditModal} className={styles.backButton}>戻る</div>
+          <div onClick={handleCloseScheduleEditModal} className={styles.backButton}>戻る</div>
         </section>
       </form>
     </section>

@@ -8,7 +8,7 @@ from datetime import timedelta
 from typing import List
 from database.database import get_db  # DBと接続するためのセッション
 from database.models import User, Schedule, Destination
-from schema import CreateUser, LoginResponse, UserResponse, CreateSchedule, ScheduleResponse, EditUser
+from schema import CreateUser, LoginResponse, UserResponse, CreateSchedule, ScheduleResponse, EditUser, EditSchedule
 from crud import create_password_hash, authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_info, get_current_user_from_cookie
 
 
@@ -183,6 +183,41 @@ async def get_schedules(
     return schedules
 
 # schedule更新処理
+@app.post("/schedules/{schedule_id}", summary="スケジュール更新")
+async def schedules_edit(
+    schedule_id: int,
+    schedule: EditSchedule,
+    db: Session = Depends(get_db),
+    create_user: UserResponse = Depends(get_current_user_from_cookie)
+):
+    if not create_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    # 対象のスケジュールをDBから取得
+    edit_schedule = db.query(Schedule).filter(Schedule.id == schedule_id, Schedule.user_id == create_user.id).first()
+
+    # スケジュール情報を更新
+    if schedule.date:
+        edit_schedule.date = schedule.date
+    if schedule.prefectures and schedule.prefectures.strip():
+        edit_schedule.prefectures = schedule.prefectures
+
+    # 目的地情報を更新
+    if schedule.destinations:
+        # 古い目的地を削除
+        db.query(Destination).filter(Destination.schedule_id == edit_schedule.id).delete()
+
+        # 新しい目的地を登録
+        clean_destinations = [d.strip() for d in schedule.destinations if d.split()]
+        for destination in clean_destinations:
+            new_destination = Destination(schedule_id=edit_schedule.id, destination=destination)
+            db.add(new_destination)
+    
+    db.commit()
+    db.refresh(edit_schedule)
+
+    # 更新後のユーザー情報を返す
+    return {"message": "Schedule updated successfully", "schedule": edit_schedule}
 
 # schedule削除処理
 @app.delete("/schedules/{schedule_id}", summary="スケジュール削除")

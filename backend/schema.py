@@ -92,3 +92,9 @@ class ScheduleResponse(BaseModel):
 
    class Config:
         orm_mode = True
+
+# スケジュール変更モデル(DBへ渡す)
+class EditSchedule(BaseModel):
+   date: Optional[datetime.date] = None
+   prefectures: Optional[str] = None
+   destinations: List[str] = Field(..., max_itme=3)

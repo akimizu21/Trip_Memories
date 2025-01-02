@@ -37,36 +37,42 @@ export default function Calendar() {
   // スケジュールリスト
   const [scheduleList, setScheduleList] = React.useState<Schedule[]>([]);
   // モーダル開閉を管理
-  const [isSheduleEditModalOpen, setIsSheduleEditModalOpen] = React.useState(false);
+  // const [isSheduleEditModalOpen, setIsSheduleEditModalOpen] = React.useState(false);
+  const [scheduleEditModalState, setScheduleEditModalState] = React.useState<{
+    isOpen: boolean;
+    targetId: number | null;
+  }>({ isOpen: false, targetId: null })
   // カレンダーイベントの状態
   const [events, setEvents] = React.useState<{ title: string; date: string}[]>([]);
 
   /**
    * スケジュールをDBから取得
    */
+  const fetchSchedules = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/schedules", {
+        method: "GET",
+        credentials: "include",
+      })
+      const rawData = await response.json();
+
+      const transformedData = transformServerData(rawData);
+
+      // 日付順に並び替え
+      const sorteData = transformedData.sort((a, b) => {
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      });
+
+      console.log(sorteData);
+
+      setScheduleList(sorteData);
+    } catch (error) {
+      console.error('Failed to fetch schedules:', error);
+    };
+  };
+  
+  // 初回レンダリング時にデータを取得
   React.useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/schedules", {
-          method: "GET",
-          credentials: "include",
-        })
-        const rawData = await response.json();
-
-        const transformedData = transformServerData(rawData);
-
-        // 日付順に並び替え
-        const sorteData = transformedData.sort((a, b) => {
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        });
-
-        console.log(sorteData);
-
-        setScheduleList(sorteData);
-      } catch (error) {
-        console.error('Failed to fetch schedules:', error);
-      };
-    }
     fetchSchedules();
   }, []);
 
@@ -85,8 +91,23 @@ export default function Calendar() {
   /**
    * モーダル開閉処理
    */
-  const handleCloseSheduleEditModal = () => {
-    setIsSheduleEditModalOpen((isSheduleEditModalOpen) => !isSheduleEditModalOpen);
+  // const handleCloseSheduleEditModal = () => {
+  //   setIsSheduleEditModalOpen((isSheduleEditModalOpen) => !isSheduleEditModalOpen);
+  // }
+
+  /**
+   * モーダルを開く処理
+   * @param targetId 
+   */
+  const handleOpenScheduleEditModal = (targetId: number) => {
+    setScheduleEditModalState({ isOpen: true, targetId });
+  };
+
+  /**
+   * モーダルを閉じる処理
+   */
+  const handleCloseScheduleEditModal = () => {
+    setScheduleEditModalState({ isOpen: false, targetId: null});
   }
 
   /**
@@ -173,10 +194,12 @@ export default function Calendar() {
                 </div>
                 {/* アイコン */}
                 <div className={styels.iconArea}>
-                  <FontAwesomeIcon icon={faPen} onClick={() => setIsSheduleEditModalOpen(true)} className={styels.far}/>
+                  <FontAwesomeIcon icon={faPen} onClick={() => handleOpenScheduleEditModal(schedule.id)} className={styels.far}/>
                   <ScheduleEditModal
-                    isSheduleEditModalOpen={isSheduleEditModalOpen}
-                    handleCloseSheduleEditModal={handleCloseSheduleEditModal}
+                    scheduleEditModalState={scheduleEditModalState.isOpen}
+                    handleCloseScheduleEditModal={handleCloseScheduleEditModal}
+                    targetId={scheduleEditModalState.targetId}
+                    fetchSchedules={fetchSchedules}
                   />
                   <FontAwesomeIcon icon={faX} onClick={() => handleDeleteSchedule(schedule.id, schedule.prefectures)} className={styels.far}/>
                 </div>
