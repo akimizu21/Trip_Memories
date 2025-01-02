@@ -5,7 +5,7 @@ from typing import Optional, List
 # ユーザーの作成(DBへ渡す)
 class CreateUser(BaseModel):
   user_name: str
-  email: EmailStr
+  email: str
   password1: str
   password2: str
 
@@ -37,6 +37,35 @@ class LoginResponse(BaseModel):
 # トークンデータ
 class TokenData(BaseModel):
   user_name: Optional[str] = None
+
+# ユーザー情報の変更(DBへ渡す)
+class EditUser(BaseModel):
+  user_name: Optional[str] = None
+  email: Optional[str] = None
+  password1: Optional[str] = None
+  password2: Optional[str] = None
+
+  # パスワードの一致チェック
+  @model_validator(mode="after")
+  def check_passwords_match(cls, values):
+    password1 = values.password1
+    password2 = values.password2
+
+    # 両方とも未入力の場合はチェックスキップ
+    if password1 is None and password2 is None:
+       return values
+    
+    # パスワードが一致しない場合にエラーを発生
+    if password1 != password2:
+        raise ValueError("Passwords do not match")
+    
+    # 空文字列のバリテーション
+    if password1 and not password1.strip():
+       raise ValueError("Password1 cannot be empty or whitespace")
+    if password2 and not password2.strip():
+            raise ValueError("Password2 cannot be empty or whitespace")
+    
+    return values
 
 # スケジュールモデル(DBへ渡す)
 class CreateSchedule(BaseModel):

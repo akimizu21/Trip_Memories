@@ -67,7 +67,7 @@ export const ScheduleModal = (props: Props) => {
         method: "POST",
         headers: {
           // サーバーへ送るファイルはJSONファイルであることを宣言
-        'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
         // 送るデータをjson形式に変換
         body: JSON.stringify(payload),

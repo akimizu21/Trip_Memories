@@ -13,7 +13,7 @@ import styles from "./EditModal.module.css"
 
 // formで利用する値のtype指定
 interface EditForm {
-  name: string;
+  user_name: string;
   email: string;
   password1: string;
   password2: string;
@@ -30,6 +30,7 @@ interface Props {
  * @returns 
  */
 export const EditModal = (props: Props) => {
+  // モーダルの開閉
   const {isEditModalOpen, handleCloseEditModal} = props
 
   // カスタムフックの指定
@@ -49,18 +50,32 @@ export const EditModal = (props: Props) => {
      * データ送信処理
      * @param data 
      */
-    const onSubmit: SubmitHandler<EditForm> = (data) => {
-      if (!name && !email && !password1 && !password2) {
-        handleCloseEditModal();
-      } else {
+    const handlePostEditUser: SubmitHandler<EditForm> = async (data) => {
+      console.log("Sending data:", data); // 送信データのログ
+      try {
+        const response = await fetch("http://localhost:8080/edit_users", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+          credentials: 'include'
+        });
+
+        if(!response.ok) {
+          throw new Error('Failed to add edit_user');
+        }
         console.log(data);
         reset();
-        handleCloseEditModal();
-      } 
-      };
-    
+        handleCloseEditModal();          
+      } catch (error) {
+        console.error('Error adding edit_user:', error);
+        throw error;
+      }
+    };
+
     // 各値をリアルタイムで取得
-    const name = watch('name'); 
+    const name = watch('user_name'); 
     const email = watch('email'); 
     const password1 = watch('password1');
     const password2 = watch('password2'); 
@@ -74,14 +89,14 @@ export const EditModal = (props: Props) => {
       <h1>ユーザー情報変更</h1>
 
       {/* フォーム領域 */}  
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.formArea}>
+      <form onSubmit={handleSubmit(handlePostEditUser)} className={styles.formArea}>
         <div className={styles.inputArea}>
           {/* ユーザー名フィールド */}
           <InputField 
-            id="name"
+            id="user_name"
             type="text"
             placeholder="ユーザー名"
-            register={register('name')}
+            register={register('user_name')}
           />
         </div>
         {/* emailフィールド */}

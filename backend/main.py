@@ -8,7 +8,7 @@ from datetime import timedelta
 from typing import List
 from database.database import get_db  # DBと接続するためのセッション
 from database.models import User, Schedule, Destination
-from schema import CreateUser, LoginResponse, UserResponse, CreateSchedule, ScheduleResponse
+from schema import CreateUser, LoginResponse, UserResponse, CreateSchedule, ScheduleResponse, EditUser
 from crud import create_password_hash, authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_info, get_current_user_from_cookie
 
 
@@ -32,10 +32,15 @@ app.add_middleware(
 
 # ------APIの実装--------
 
-# リダイレクト用テスト
-@app.get("/test")
-async def redirect_page():
-    return RedirectResponse("http://localhost/login")
+# user情報取得
+@app.get("/users", summary="ユーザー情報取得")
+async def get_user(
+    db: Session = Depends(get_db),
+    create_user: UserResponse = Depends(get_current_user_from_cookie)
+):
+    user = db.query(User).where(User.id == create_user.id).first()
+
+    return user
 
 # user情報を登録
 @app.post("/users", summary="新規登録")
@@ -99,7 +104,37 @@ def logout(response: Response):
     return {"state": "success", "redirect_url": "http://localhost/login"}
 
 # user情報変更処理
+@app.post("/edit_users/", summary="ユーザー情報変更")
+def user_edit(
+    user: EditUser,
+    db: Session = Depends(get_db),
+    create_user: UserResponse = Depends(get_current_user_from_cookie) 
+):
+    # ユーザーが認証されていない場合はエラーを返す
+    if not create_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    # 対象のユーザーをDBから取得
+    edit_user = db.query(User).where(User.id == create_user.id).first()
+    # ユーザーが存在しない場合はエラーを返す
+    if not edit_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # ユーザー情報を更新
+    if user.user_name and user.user_name.strip():
+        edit_user.user_name = user.user_name
 
+    if user.email and user.email.strip():
+        edit_user.email = user.email
+
+    if user.password1 and user.password1.strip():
+        edit_user.password = create_password_hash(user.password1)
+    
+    # データベースを変更
+    db.commit()
+    db.refresh(edit_user)
+
+    # 更新後のユーザー情報を返す
+    return {"message": "User updated successfully", "user": edit_user}
+        
 # schedule登録処理
 @app.post("/schedules", summary="スケジュール登録", response_model=ScheduleResponse)
 async def create_schedule(
