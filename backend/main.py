@@ -256,3 +256,8 @@ async def delete_schedules(
     db.commit()
 
     return {"status": "予定を削除しました"}
+
+# ログインしているかを確認する
+@app.get("/check_login", summary="ログイン状態確認")
+async def check_login(current_user = Depends(get_current_user_from_cookie)):
+    return JSONResponse(content={"isAuthenticated": True})

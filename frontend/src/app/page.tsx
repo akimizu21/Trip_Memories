@@ -41,6 +41,35 @@ export default function Home() {
   const [countData, setCountData] = React.useState<number[]>([]);
 
   /**
+   * ログインしていなければログイン画面へリダイレクト
+   */
+  React.useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/check_login", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Not authenticated");
+        }
+
+        const result = await response.json();
+        if (!result.isAuthenticated) {
+          window.location.href = "/login";
+        }
+      } catch (error) {
+          console.error("Redirecting to login due to auth error:", error);
+          window.location.href = "/login";
+      }
+    };
+
+    checkLoginStatus();
+  }, [])
+
+
+  /**
    * スケジュールをDBから取得
    */
   const fetchSchedules = async () => {
