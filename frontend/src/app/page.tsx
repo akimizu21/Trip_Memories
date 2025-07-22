@@ -192,7 +192,7 @@ export default function Home() {
       {/* 旅行の軌跡表示領域 */}
         <section className={styles.trajectoryArea}>
           <h2>旅行の軌跡</h2>
-          <div className={styles.showMap}>地図を表示</div>
+          <Link href={"map"} className={styles.showMap}>地図を表示</Link>
           <BarChart
             labels={labelData}
             data={countData}
