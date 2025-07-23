@@ -4,6 +4,11 @@ import React from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { scaleLinear } from "d3-scale";
 import { Feature } from "geojson";
+/**
+ * styels
+ */
+import styles from "./page.module.css"
+
 
 // // 都道府県ごとの訪問回数を props で受け取る
 // interface Props {
@@ -59,14 +64,9 @@ export default function Map() {
         projection="geoMercator"
         projectionConfig={{
           center: [137, 38],
-          scale: 2000,
+          scale: 1000,
         }}
-        width={800}
-        height={600}
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
+        className={styles.mapContainer}
       >
         <Geographies geography={geoUrl}>
           {({ geographies }: { geographies: Feature[] }) =>
@@ -80,9 +80,19 @@ export default function Map() {
                   geography={geo}
                   fill={colorScale(count)}
                   style={{
-                    default: { outline: "none" },
-                    hover: { fill: "#ffa", outline: "none" },
-                    pressed: { fill: "#f00", outline: "none" },
+                    default: { 
+                      outline: "none",
+                      stroke: "#555",
+                      strokeWidth: 0.5,
+                    },
+                    hover: {
+                      fill: "#ffa",
+                      outline: "none"
+                    },
+                    pressed: {
+                      fill: "#f00",
+                      outline: "none"
+                    },
                   }}
                 />
               );
