@@ -88,8 +88,9 @@ services:
   #   networks:
   #     - app_network
 
-volumes:
-  mysql_data:
+# 一旦コメントアウト
+# volumes:
+#   mysql_data:
 
 networks:
   app_network:
