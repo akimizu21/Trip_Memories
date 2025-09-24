@@ -18,8 +18,8 @@ services:
       # DB_HOST=db にして、docker-compose 内の MySQL コンテナへ接続
       # AWS 環境
       # DB_HOST を MySQL 用EC2のプライベートIP または RDSエンドポイントに書き換え
-      # - DB_HOST=db        # ← ローカル用
-      - DB_HOST=172.31.16.112  # ← AWS用にコメント解除して書き換え
+      - DB_HOST=db        # ← ローカル用
+      # - DB_HOST=172.31.16.112  # ← AWS用にコメント解除して書き換え
       - DB_PORT=3306
       - DB_USER=user
       - DB_PASSWORD=password
@@ -58,39 +58,39 @@ services:
   # ✅ ローカル専用のDBサービス
   # AWSではコメントアウト
   # ==========================
-  # db:
-  #   container_name: MySQL
-  #   build: 
-  #     context: .
-  #     dockerfile: docker/database/Dockerfile
-  #   # DBのボリュームを指定
-  #   # ローカルの/data/dbをコンテナの/var/lib/mysqlにマウントする
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
-  #   # コンテナ内の環境変数を設定
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=root
-  #     - MYSQL_DATABASE=app
-  #     - MYSQL_USER=user
-  #     - MYSQL_PASSWORD=password
-  #   # DBのコンテナのヘルスチェックを行う
-  #   # mysqladmin(MySQLサーバーの管理を行うクライアントを使ってDBコンテナ自身(127.0.0.1)にpingを送ってヘルスチェックを行う
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$MYSQL_USER -p$MYSQL_PASSWORD"]
-  #     # ヘルスチェックのインターバルは10秒
-  #     interval: 10s
-  #     # タイムアウト時間は10秒
-  #     timeout: 10s
-  #     # リトライ回数は3回
-  #     retries: 3
-  #     # ヘルスチェックが失敗しても無視する時間は30秒
-  #     start_period: 30s
-  #   networks:
-  #     - app_network
+  db:
+    container_name: MySQL
+    build: 
+      context: .
+      dockerfile: docker/database/Dockerfile
+    # DBのボリュームを指定
+    # ローカルの/data/dbをコンテナの/var/lib/mysqlにマウントする
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # コンテナ内の環境変数を設定
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    # DBのコンテナのヘルスチェックを行う
+    # mysqladmin(MySQLサーバーの管理を行うクライアントを使ってDBコンテナ自身(127.0.0.1)にpingを送ってヘルスチェックを行う
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$MYSQL_USER -p$MYSQL_PASSWORD"]
+      # ヘルスチェックのインターバルは10秒
+      interval: 10s
+      # タイムアウト時間は10秒
+      timeout: 10s
+      # リトライ回数は3回
+      retries: 3
+      # ヘルスチェックが失敗しても無視する時間は30秒
+      start_period: 30s
+    networks:
+      - app_network
 
-# 一旦コメントアウト
-# volumes:
-#   mysql_data:
+# 一旦コメントアウト デプロイ時には不要
+volumes:
+  mysql_data:
 
 networks:
   app_network:

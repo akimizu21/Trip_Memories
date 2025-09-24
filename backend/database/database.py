@@ -7,8 +7,8 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 # 環境変数から読み込む
 user_name = os.getenv("DB_USER", "user")
 password = os.getenv("DB_PASSWORD", "password")
-# host = os.getenv("DB_HOST", "db") # ローカルの場合
-host = os.getenv("DB_HOST", "172.31.16.112") # AWS の場合
+host = os.getenv("DB_HOST", "db") # ローカルの場合
+# host = os.getenv("DB_HOST", "172.31.16.112") # AWS の場合 IPアドレスは都度修正
 port = os.getenv("DB_PORT", "3306")
 database_name = os.getenv("DB_NAME", "app")
 
