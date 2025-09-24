@@ -50,7 +50,7 @@ export default function Calendar() {
    */
   const fetchSchedules = async () => {
     try {
-      const response = await fetch("http://localhost:8080/schedules", {
+      const response = await fetch("http://api/schedules", {
         method: "GET",
         credentials: "include",
       })
@@ -115,7 +115,7 @@ export default function Calendar() {
    * @param targetId 
    */
   const handleDeleteScheduleRequest = async (targetId: number) => {
-    fetch (`http://localhost:8080/schedules/${targetId}`, {
+    fetch (`http://api/schedules/${targetId}`, {
       method: "DELETE",
       credentials: "include"
     })

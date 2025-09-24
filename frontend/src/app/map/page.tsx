@@ -35,7 +35,7 @@ export default function Map() {
 
   // スケジュールAPIからデータを取得し、都道府県カウントをセット
   React.useEffect(() => {
-    fetch("http://localhost:8080/schedules", {
+    fetch("http://api/schedules", {
       credentials: "include",
     })
     .then((response) => response.json())

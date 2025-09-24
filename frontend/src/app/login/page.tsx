@@ -41,7 +41,7 @@ export default function Login() {
   const handlePostLogin: SubmitHandler<LoginForm> = async (data) => { 
     console.log(data);
     try {
-      const response = await fetch("http://localhost:8080/login", {
+      const response = await fetch("http://api/login", {
         method: "POST",
         headers: {
           // FastAPIのログインエンドポイントが OAuth2PasswordRequestForm を使用

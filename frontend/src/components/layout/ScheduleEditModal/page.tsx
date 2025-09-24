@@ -66,7 +66,7 @@ export const ScheduleEditModal = (props: Props) => {
     console.log(targetId)
 
     try {
-      const response = await fetch(`http://localhost:8080/schedules/${targetId}`, {
+      const response = await fetch(`http://api:8080/schedules/${targetId}`, {
         method: "POST",
         headers: {
           // サーバーへ送るファイルはJSONファイルであることを宣言
