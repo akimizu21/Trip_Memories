@@ -19,7 +19,7 @@ services:
       # AWS 環境
       # DB_HOST を MySQL 用EC2のプライベートIP または RDSエンドポイントに書き換え
       # - DB_HOST=db        # ← ローカル用
-      - DB_HOST=10.0.0.116  # ← AWS用にコメント解除して書き換え
+      - DB_HOST=172.31.16.112  # ← AWS用にコメント解除して書き換え
       - DB_PORT=3306
       - DB_USER=user
       - DB_PASSWORD=password
