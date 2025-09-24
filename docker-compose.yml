@@ -37,7 +37,8 @@ services:
     volumes:
       - ./frontend:/src # ローカルをコンテナにマウント
       - /src/node_modules # node_modulesを共有せずコンテナ内で管理
-    command: sh -c "cd src && npm run dev" #コンテナを立ち上げたときに自動的にbuildする
+    # command: sh -c "cd src && npm run dev" #コンテナを立ち上げたときに自動的にbuildする
+    command: npm start # 本番用
     ports:
       - "3000:3000"
     environment:
