@@ -7,8 +7,7 @@ import { Feature } from "geojson";
 /**
  * styels
  */
-import styles from "./page.module.css"
-
+import styles from "./page.module.css";
 
 // // 都道府県ごとの訪問回数を props で受け取る
 // interface Props {
@@ -27,22 +26,22 @@ const countPrefectures = (schedules: any[]) => {
       counts[prefecture] = (counts[prefecture] || 0) + 1;
     }
   });
-  return counts
-}
+  return counts;
+};
 
 export default function Map() {
   const [visitData, setVisitData] = React.useState<Record<string, number>>({});
 
   // スケジュールAPIからデータを取得し、都道府県カウントをセット
   React.useEffect(() => {
-    fetch("http://api/schedules", {
+    fetch("/api/schedules", {
       credentials: "include",
     })
-    .then((response) => response.json())
-    .then((data) => {
-      const counts = countPrefectures(data);
-      setVisitData(counts);
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        const counts = countPrefectures(data);
+        setVisitData(counts);
+      });
   }, []);
 
   // 色のスケールを定義
@@ -55,9 +54,9 @@ export default function Map() {
     <div
       style={{
         width: "100%",
-        maxWidth: "1000px",      // 最大幅の制限（適宜調整可能）
-        margin: "0 auto",        // 中央寄せ
-        aspectRatio: "3 / 2",    // アスペクト比を維持（画面に収まる比率）
+        maxWidth: "1000px", // 最大幅の制限（適宜調整可能）
+        margin: "0 auto", // 中央寄せ
+        aspectRatio: "3 / 2", // アスペクト比を維持（画面に収まる比率）
       }}
     >
       <ComposableMap
@@ -70,28 +69,28 @@ export default function Map() {
       >
         <Geographies geography={geoUrl}>
           {({ geographies }: { geographies: Feature[] }) =>
-            geographies.map((geo: Feature) => {
+            geographies.map((geo: Feature, index) => {
               const name = geo.properties?.nam_ja as string;
               const count = visitData[name] || 0;
 
               return (
                 <Geography
-                  key={geo.rsmKey}
+                  key={`geo-${index}`} // rsmKeyの代わりにインデックスを使用
                   geography={geo}
                   fill={colorScale(count)}
                   style={{
-                    default: { 
+                    default: {
                       outline: "none",
                       stroke: "#555",
                       strokeWidth: 0.5,
                     },
                     hover: {
                       fill: "#ffa",
-                      outline: "none"
+                      outline: "none",
                     },
                     pressed: {
                       fill: "#f00",
-                      outline: "none"
+                      outline: "none",
                     },
                   }}
                 />

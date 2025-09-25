@@ -53,7 +53,7 @@ export const EditModal = (props: Props) => {
     const handlePostEditUser: SubmitHandler<EditForm> = async (data) => {
       console.log("Sending data:", data); // 送信データのログ
       try {
-        const response = await fetch("http://api:8080/edit_users", {
+        const response = await fetch("/api/edit_users", {
           method: "POST",
           headers: {
             'Content-Type': 'application/json',

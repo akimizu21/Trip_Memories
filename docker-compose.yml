@@ -1,6 +1,6 @@
 version: '3.8'
 
-services:
+services: 
   backend:
     # コンテナ名をbackendに設定
     container_name: backend
@@ -24,6 +24,10 @@ services:
       - DB_USER=user
       - DB_PASSWORD=password
       - DB_NAME=app
+      # EC2用に追加
+      # - BASE_URL=http://localhost  # ローカル用
+      # EC2デプロイ時は以下に変更
+      - BASE_URL=http://43.206.214.36
     networks:
       - app_network
 
@@ -47,7 +51,7 @@ services:
       - app_network
     
   nginx:
-    image: nginx:latest
+    image: nginx:1.25.3
     ports:
       - "80:80"
     volumes:
@@ -61,9 +65,7 @@ services:
   # ==========================
   db:
     container_name: MySQL
-    build: 
-      context: .
-      dockerfile: docker/database/Dockerfile
+    image: mysql:8.0.35
     # DBのボリュームを指定
     # ローカルの/data/dbをコンテナの/var/lib/mysqlにマウントする
     volumes:

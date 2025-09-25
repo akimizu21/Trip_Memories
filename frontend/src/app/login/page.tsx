@@ -1,4 +1,4 @@
-"use client"
+"use client";
 /**
  * Login
  */
@@ -11,41 +11,41 @@ import { InputField } from "@/components/ui/InputField/page";
 /**
  * styels
  */
-import styles from "./page.module.css"
+import styles from "./page.module.css";
 
 // formで利用する値のtype指定
 interface LoginForm {
   user_name: string;
   password: string;
-};
+}
 
 /**
- * 
- * @returns 
+ *
+ * @returns
  */
 export default function Login() {
   // カスタムフックの指定
-  const { 
+  const {
     register,
     handleSubmit,
-    formState: {errors}
+    formState: { errors },
   } = useForm<LoginForm>({
     // ログインボタンを押した時のみバリデーションを行う
-    reValidateMode: 'onSubmit',
+    reValidateMode: "onSubmit",
   });
 
   /**
    * ログイン情報送信処理
-   * @param data 
+   * @param data
    */
-  const handlePostLogin: SubmitHandler<LoginForm> = async (data) => { 
+  const handlePostLogin: SubmitHandler<LoginForm> = async (data) => {
     console.log(data);
     try {
-      const response = await fetch("http://api/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           // FastAPIのログインエンドポイントが OAuth2PasswordRequestForm を使用
-          'Content-Type': 'application/x-www-form-urlencoded',
+          "Content-Type": "application/x-www-form-urlencoded",
         },
         // 送るデータを指定
         body: new URLSearchParams({
@@ -56,7 +56,7 @@ export default function Login() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add User');
+        throw new Error("Failed to add User");
       }
 
       // レスポンスデータを取得
@@ -69,7 +69,7 @@ export default function Login() {
         console.error("Redirect URL not provided");
       }
     } catch (error) {
-      console.error('Error adding User:', error);
+      console.error("Error adding User:", error);
       alert("ログインに失敗しました");
     }
   };
@@ -81,37 +81,39 @@ export default function Login() {
         <h1>画像表示</h1>
 
         {/* フォーム領域 */}
-        <form onSubmit={handleSubmit(handlePostLogin)}className={styles.formArea}>
-
+        <form
+          onSubmit={handleSubmit(handlePostLogin)}
+          className={styles.formArea}
+        >
           {/* ユーザー名フィールド */}
           <InputField
             id="user_name"
             type="text"
             placeholder="ユーザー名"
-            register={register('user_name', {
+            register={register("user_name", {
               required: {
                 value: true,
-                message: 'ユーザー名を入力してください'
+                message: "ユーザー名を入力してください",
               },
             })}
             error={errors.user_name}
           />
           {/* パスワードフィールド */}
-            <InputField
-              id="password"
-              type="password" 
-              placeholder="パスワード" 
-              register={register('password', {
-                required: {
-                  value: true,
-                  message: 'パスワードを入力してください'
-                },
-              })}
-              error={errors.password}
-            />
+          <InputField
+            id="password"
+            type="password"
+            placeholder="パスワード"
+            register={register("password", {
+              required: {
+                value: true,
+                message: "パスワードを入力してください",
+              },
+            })}
+            error={errors.password}
+          />
 
           {/* ログインボタン */}
-          <button type="submit" className={styles.loginButton} >
+          <button type="submit" className={styles.loginButton}>
             ログイン
           </button>
         </form>

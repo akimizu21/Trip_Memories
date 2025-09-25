@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from typing import List
 
@@ -17,12 +18,15 @@ from schema import (CreateSchedule, CreateUser, EditSchedule, EditUser,
 
 app = FastAPI()
 
-origins = ["http://localhost", "http://localhost:3000", "http://localhost:8080", "null"]
+# 環境変数からベースURLを取得（デフォルトはlocalhost）
+BASE_URL = os.getenv("BASE_URL", "http://localhost")
+
+origins = [BASE_URL, f"{BASE_URL}:3000", f"{BASE_URL}:8080", "null"]
 
 # CORSを回避するために設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # NginxのURLを許可
+    allow_origins=origins,  # 動的に設定されたURLを許可
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -59,7 +63,7 @@ async def create_user(user: CreateUser, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return {"state": "success", "redirect_url": "http://localhost/login"}
+    return {"state": "success", "redirect_url": f"{BASE_URL}/login"}
 
 
 # ログイン処理
@@ -85,7 +89,7 @@ async def login(
     response = JSONResponse(
         content={
             "status": "success",
-            "redirect_url": "http://localhost/",  # ダッシュボードのURL
+            "redirect_url": f"{BASE_URL}/",  # 動的なダッシュボードURL
             "access_token": access_token,  # トークンをレスポンスボディに含める
             "token_type": "bearer",  # トークンタイプも明示
         }
@@ -106,7 +110,7 @@ def logout(response: Response):
     # クライアント側のクッキー削除
     response.delete_cookie("access_token")
 
-    return {"state": "success", "redirect_url": "http://localhost/login"}
+    return {"state": "success", "redirect_url": f"{BASE_URL}/login"}
 
 
 # user情報変更処理

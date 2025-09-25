@@ -5,12 +5,12 @@ import { useForm, SubmitHandler } from "react-hook-form";
 /**
  * components
  */
-import { InputField } from "@/components/ui/InputField/page"
+import { InputField } from "@/components/ui/InputField/page";
 import { SelectField } from "@/components/ui/SelectField/page";
 /**
  * styles
  */
-import styles from "./ScheduleModal.module.css"
+import styles from "./ScheduleModal.module.css";
 
 // formで利用する値のtype指定
 interface ScheduleForm {
@@ -19,39 +19,40 @@ interface ScheduleForm {
   destination1: string;
   destination2: string;
   destination3: string;
-};
+}
 
 interface Props {
   isScheduleModalOpnen: boolean;
   handleCloseScheduleModal: () => void;
-  fetchSchedules: () => Promise<void>
+  fetchSchedules: () => Promise<void>;
 }
 
 export const ScheduleModal = (props: Props) => {
-  const {isScheduleModalOpnen, handleCloseScheduleModal, fetchSchedules} = props
+  const { isScheduleModalOpnen, handleCloseScheduleModal, fetchSchedules } =
+    props;
 
   // カスタムフックの指定
   const {
     register,
     handleSubmit,
     reset,
-    formState: {errors}
+    formState: { errors },
   } = useForm<ScheduleForm>({
     // 変更ボタンを押したときのみバリデーションを行う
-    reValidateMode: 'onSubmit',
+    reValidateMode: "onSubmit",
   });
 
   // 空フォームのデータが空文字列で送られるため要検討 //
   /**
    * データ送信処理
-   * @param data 
+   * @param data
    */
   const handlePostSchedule: SubmitHandler<ScheduleForm> = async (data) => {
     // 目的地をリスト形式に変換
     const destinations = [
       data.destination1,
       data.destination2,
-      data.destination3
+      data.destination3,
     ].filter(Boolean); // 空の目的地を除外
 
     const payload = {
@@ -63,49 +64,52 @@ export const ScheduleModal = (props: Props) => {
     console.log(payload);
 
     try {
-      const response = await fetch("http://api:8080/schedules", {
+      const response = await fetch("/api/schedules", {
         method: "POST",
         headers: {
           // サーバーへ送るファイルはJSONファイルであることを宣言
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         // 送るデータをjson形式に変換
         body: JSON.stringify(payload),
-        credentials: 'include',
+        credentials: "include",
       });
-      
-      if(!response.ok) {
-        throw new Error('Failed to add schedule');
+
+      if (!response.ok) {
+        throw new Error("Failed to add schedule");
       }
       await fetchSchedules();
       reset();
       handleCloseScheduleModal();
     } catch (error) {
-      console.error('Error adding schedule:', error);
+      console.error("Error adding schedule:", error);
       throw error;
     }
   };
-  
+
   if (!isScheduleModalOpnen) {
-    return <></>
+    return <></>;
   }
 
   return (
     <section className={styles.orverlay}>
       <h1>予定を追加</h1>
 
-      {/* フォーム領域 */}  
-      <form onSubmit={handleSubmit(handlePostSchedule)} className={styles.formArea}>
+      {/* フォーム領域 */}
+      <form
+        onSubmit={handleSubmit(handlePostSchedule)}
+        className={styles.formArea}
+      >
         {/* 日時フィールド */}
         <div className={styles.inputArea}>
-          <InputField 
+          <InputField
             id="date"
             type="date"
             placeholder="日時"
-            register={register('date', {
+            register={register("date", {
               required: {
                 value: true,
-                message: '日時を入力してください'
+                message: "日時を入力してください",
               },
             })}
             error={errors.date}
@@ -113,12 +117,12 @@ export const ScheduleModal = (props: Props) => {
         </div>
         {/* 都道府県フィールド */}
         <div className={styles.inputArea}>
-          <SelectField 
+          <SelectField
             id="prefectures"
-            register={register('prefectures', {
+            register={register("prefectures", {
               required: {
                 value: true,
-                message: '都道府県を入力してください'
+                message: "都道府県を入力してください",
               },
             })}
             error={errors.prefectures}
@@ -126,14 +130,14 @@ export const ScheduleModal = (props: Props) => {
         </div>
         {/* 目的地1フィールド */}
         <div className={styles.inputArea}>
-          <InputField 
+          <InputField
             id="destination1"
             type="text"
             placeholder="目的地1"
-            register={register('destination1', {
+            register={register("destination1", {
               required: {
                 value: true,
-                message: '目的地1を入力してください'
+                message: "目的地1を入力してください",
               },
             })}
             error={errors.destination1}
@@ -141,23 +145,23 @@ export const ScheduleModal = (props: Props) => {
         </div>
         {/* 目的地2フィールド */}
         <div className={styles.inputArea}>
-          <InputField 
+          <InputField
             id="destination2"
             type="text"
             placeholder="目的地2"
-            register={register('destination2')}
+            register={register("destination2")}
           />
         </div>
         {/* 目的地3フィールド */}
         <div className={styles.inputArea}>
-          <InputField 
+          <InputField
             id="destination3"
             type="text"
             placeholder="目的地3"
-            register={register('destination3')}
+            register={register("destination3")}
           />
         </div>
-      
+
         {/* ボタンエリア */}
         <section className={styles.buttonArea}>
           {/* 新規登録ボタン */}
@@ -165,9 +169,11 @@ export const ScheduleModal = (props: Props) => {
             追加
           </button>
           {/* 戻るボタン */}
-          <div onClick={handleCloseScheduleModal} className={styles.backButton}>戻る</div>
+          <div onClick={handleCloseScheduleModal} className={styles.backButton}>
+            戻る
+          </div>
         </section>
       </form>
     </section>
-  )
-}
+  );
+};

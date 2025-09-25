@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
 /**
  * Calendar
  */
 import React from "react";
-import Link from "next/link"
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faPen, faX } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faPen, faX } from "@fortawesome/free-solid-svg-icons";
 /**
  * data
  */
@@ -14,25 +14,26 @@ import { Schedule, transformServerData } from "@/constants/data";
 /**
  * componetnts
  */
-import { Calendar as ScheduleCalendar } from "@/components/layout/Calendar/page"
+import { Calendar as ScheduleCalendar } from "@/components/layout/Calendar/page";
 import { ScheduleEditModal } from "@/components/layout/ScheduleEditModal/page";
 /**
  * styels
  */
-import styels from "./page.module.css"
-
+import styels from "./page.module.css";
 
 export default function Calendar() {
   // 本日の日付を取得
   const today = new Date();
   // 曜日を取得
-  const weekdays = ["Sunday",
+  const weekdays = [
+    "Sunday",
     "Monday",
     "Tuesday",
     "Wednesday",
     "Thursday",
     "Friday",
-    "Saturday"][today.getDay()];
+    "Saturday",
+  ][today.getDay()];
 
   // スケジュールリスト
   const [scheduleList, setScheduleList] = React.useState<Schedule[]>([]);
@@ -41,19 +42,21 @@ export default function Calendar() {
   const [scheduleEditModalState, setScheduleEditModalState] = React.useState<{
     isOpen: boolean;
     targetId: number | null;
-  }>({ isOpen: false, targetId: null })
+  }>({ isOpen: false, targetId: null });
   // カレンダーイベントの状態
-  const [events, setEvents] = React.useState<{ title: string; date: string}[]>([]);
+  const [events, setEvents] = React.useState<{ title: string; date: string }[]>(
+    []
+  );
 
   /**
    * スケジュールをDBから取得
    */
   const fetchSchedules = async () => {
     try {
-      const response = await fetch("http://api/schedules", {
+      const response = await fetch("/api/schedules", {
         method: "GET",
         credentials: "include",
-      })
+      });
       const rawData = await response.json();
 
       const transformedData = transformServerData(rawData);
@@ -67,10 +70,10 @@ export default function Calendar() {
 
       setScheduleList(sorteData);
     } catch (error) {
-      console.error('Failed to fetch schedules:', error);
-    };
+      console.error("Failed to fetch schedules:", error);
+    }
   };
-  
+
   // 初回レンダリング時にデータを取得
   React.useEffect(() => {
     fetchSchedules();
@@ -79,14 +82,14 @@ export default function Calendar() {
   /**
    * scheduleList が更新されたときに events を再計算
    */
-  React.useEffect (() => {
+  React.useEffect(() => {
     const updateEvents = scheduleList.map((schedule) => ({
       title: schedule.prefectures,
       date: schedule.date,
     }));
     setEvents(updateEvents);
     console.log(events);
-  },[scheduleList]); // scheduleList が更新されたときに再実行
+  }, [scheduleList]); // scheduleList が更新されたときに再実行
 
   /**
    * モーダル開閉処理
@@ -97,7 +100,7 @@ export default function Calendar() {
 
   /**
    * モーダルを開く処理
-   * @param targetId 
+   * @param targetId
    */
   const handleOpenScheduleEditModal = (targetId: number) => {
     setScheduleEditModalState({ isOpen: true, targetId });
@@ -107,31 +110,31 @@ export default function Calendar() {
    * モーダルを閉じる処理
    */
   const handleCloseScheduleEditModal = () => {
-    setScheduleEditModalState({ isOpen: false, targetId: null});
-  }
+    setScheduleEditModalState({ isOpen: false, targetId: null });
+  };
 
   /**
    * DBからスケジュールを削除する処理
-   * @param targetId 
+   * @param targetId
    */
   const handleDeleteScheduleRequest = async (targetId: number) => {
-    fetch (`http://api/schedules/${targetId}`, {
+    fetch(`/api/schedules/${targetId}`, {
       method: "DELETE",
-      credentials: "include"
+      credentials: "include",
     })
-    .then(respnse => respnse.json())
-    .then(data => {
-      console.log("Succsess", data);
-    })
-    .catch((error) => {
-      console.error("Error", error)
-    })
-  }
+      .then((respnse) => respnse.json())
+      .then((data) => {
+        console.log("Succsess", data);
+      })
+      .catch((error) => {
+        console.error("Error", error);
+      });
+  };
 
   /**
    * スケジュール削除処理
-   * @param targetId 
-   * @param targetTitle 
+   * @param targetId
+   * @param targetTitle
    */
   const handleDeleteSchedule = (targetId: number, targetTitle: string) => {
     if (window.confirm(`旅先: ${targetTitle}を削除しますか?`)) {
@@ -158,21 +161,22 @@ export default function Calendar() {
 
       {/* カレンダー領域 */}
       <section className={styels.calendarArea}>
-        <ScheduleCalendar 
-          events={events}
-        />
+        <ScheduleCalendar events={events} />
       </section>
 
       {/* 予定領域 */}
       <section className={styels.scheduleArea}>
         {/* 日時表示エリア */}
         <div className={styels.dateArea}>
-          <p className={styels.date}>Today : {today.getFullYear()}.{today.getMonth() + 1}.{today.getDate()}</p>
+          <p className={styels.date}>
+            Today : {today.getFullYear()}.{today.getMonth() + 1}.
+            {today.getDate()}
+          </p>
           <p className={styels.date}>{weekdays}</p>
         </div>
         {/* 予定カード表示エリア */}
         <ul className={styels.scheduleList}>
-          {scheduleList.map((schedule:any) => {
+          {scheduleList.map((schedule: any) => {
             return (
               <li className={styels.scheduleCard} key={schedule.id}>
                 <div>
@@ -183,31 +187,49 @@ export default function Calendar() {
                   </span>
                   {/* スケジュールの目的地 */}
                   <ul className={styels.destinations}>
-                    <li className={styels.destination}>目的地1 : {schedule.destination1}</li>
+                    <li className={styels.destination}>
+                      目的地1 : {schedule.destination1}
+                    </li>
                     {schedule.destination2 && (
-                      <li className={styels.destination}>目的地2 : {schedule.destination2}</li>
-                    )} {/* 空でなければ表示する */}
+                      <li className={styels.destination}>
+                        目的地2 : {schedule.destination2}
+                      </li>
+                    )}{" "}
+                    {/* 空でなければ表示する */}
                     {schedule.destination3 && (
-                      <li className={styels.destination}>目的地3 : {schedule.destination3}</li>
-                    )} {/* 空でなければ表示する */}
+                      <li className={styels.destination}>
+                        目的地3 : {schedule.destination3}
+                      </li>
+                    )}{" "}
+                    {/* 空でなければ表示する */}
                   </ul>
                 </div>
                 {/* アイコン */}
                 <div className={styels.iconArea}>
-                  <FontAwesomeIcon icon={faPen} onClick={() => handleOpenScheduleEditModal(schedule.id)} className={styels.far}/>
+                  <FontAwesomeIcon
+                    icon={faPen}
+                    onClick={() => handleOpenScheduleEditModal(schedule.id)}
+                    className={styels.far}
+                  />
                   <ScheduleEditModal
                     scheduleEditModalState={scheduleEditModalState.isOpen}
                     handleCloseScheduleEditModal={handleCloseScheduleEditModal}
                     targetId={scheduleEditModalState.targetId}
                     fetchSchedules={fetchSchedules}
                   />
-                  <FontAwesomeIcon icon={faX} onClick={() => handleDeleteSchedule(schedule.id, schedule.prefectures)} className={styels.far}/>
+                  <FontAwesomeIcon
+                    icon={faX}
+                    onClick={() =>
+                      handleDeleteSchedule(schedule.id, schedule.prefectures)
+                    }
+                    className={styels.far}
+                  />
                 </div>
               </li>
-            )
+            );
           })}
         </ul>
       </section>
     </>
-  )
+  );
 }

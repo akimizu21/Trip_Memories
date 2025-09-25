@@ -45,7 +45,7 @@ export default function Register() {
   const handlePostUser: SubmitHandler<RegisterForm> = async (data) => {
     console.log(data);
     try {
-      const response = await fetch("http://api:8080/users", {
+      const response = await fetch("/api/users", {
         method: "POST",
         headers: {
           // 

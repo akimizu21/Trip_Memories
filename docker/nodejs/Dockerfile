@@ -1,19 +1,17 @@
-# 開発用
+# ベースイメージとしてUbuntuを使用
+FROM ubuntu:20.04
 
-# # ベースイメージとしてNodeを使用してビルド
-# FROM node:18 AS build
+# 非対話的インストール設定
+ENV DEBIAN_FRONTEND=noninteractive
 
-# # アプリケーションディレクトリを作成して移動
-# WORKDIR /src
+# Node.js 18をインストール
+RUN apt-get update && \
+    apt-get install -y curl ca-certificates && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# # package.jsonとpackage-lock.jsonをコピーして依存関係をインストール
-# COPY frontend/package*.json .
-# RUN npm install
-
-# ======================
-# 1. ビルドステージ
-# ======================
-FROM node:18 AS builder
 WORKDIR /app
 
 # 依存関係をインストール
@@ -23,18 +21,6 @@ RUN npm install
 # アプリのソースをコピーしてビルド
 COPY frontend ./
 RUN npm run build
-
-# ======================
-# 2. 実行ステージ
-# ======================
-FROM node:18-alpine AS runner
-WORKDIR /app
-
-# 本番に必要なファイルだけコピー
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
 
 # ポート公開
 EXPOSE 3000

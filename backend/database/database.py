@@ -13,7 +13,7 @@ port = os.getenv("DB_PORT", "3306")
 database_name = os.getenv("DB_NAME", "app")
 
 # 接続文字列
-DATABASE = 'mysql://%s:%s@%s:%s/%s?charset=utf8' % (
+DATABASE = 'mysql+pymysql://%s:%s@%s:%s/%s?charset=utf8' % (
   user_name,
   password,
   host,

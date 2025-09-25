@@ -5,12 +5,12 @@ import { useForm, SubmitHandler } from "react-hook-form";
 /**
  * components
  */
-import { InputField } from "@/components/ui/InputField/page"
+import { InputField } from "@/components/ui/InputField/page";
 import { SelectField } from "@/components/ui/SelectField/page";
 /**
  * styles
  */
-import styles from "./ScheduleEditModal.module.css"
+import styles from "./ScheduleEditModal.module.css";
 
 // formで利用する値のtype指定
 interface ScheduleEditForm {
@@ -19,7 +19,7 @@ interface ScheduleEditForm {
   destination1: string;
   destination2: string;
   destination3: string;
-};
+}
 
 interface Props {
   scheduleEditModalState: boolean;
@@ -29,31 +29,37 @@ interface Props {
 }
 
 export const ScheduleEditModal = (props: Props) => {
-  const {scheduleEditModalState, handleCloseScheduleEditModal, targetId, fetchSchedules} = props
+  const {
+    scheduleEditModalState,
+    handleCloseScheduleEditModal,
+    targetId,
+    fetchSchedules,
+  } = props;
 
   // カスタムフックの指定
-    const {
-      register,
-      handleSubmit,
-      reset,
-      formState: {errors}
-    } = useForm<ScheduleEditForm>({
-      // 変更ボタンを押したときのみバリデーションを行う
-      reValidateMode: 'onSubmit',
-    });
-
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ScheduleEditForm>({
+    // 変更ボタンを押したときのみバリデーションを行う
+    reValidateMode: "onSubmit",
+  });
 
   // 空フォームのデータが空文字列で送られるため要検討 //
   /**
    * データ送信処理
-   * @param data 
+   * @param data
    */
-  const handlePostEditSchedule: SubmitHandler<ScheduleEditForm> = async (data) => {
+  const handlePostEditSchedule: SubmitHandler<ScheduleEditForm> = async (
+    data
+  ) => {
     // 目的地をリスト形式に変換
     const destinations = [
       data.destination1,
       data.destination2,
-      data.destination3
+      data.destination3,
     ].filter(Boolean); // 空の目的地を除外
 
     const payload = {
@@ -61,89 +67,89 @@ export const ScheduleEditModal = (props: Props) => {
       prefectures: data.prefectures,
       destinations,
     };
-  
+
     console.log(payload);
-    console.log(targetId)
+    console.log(targetId);
 
     try {
-      const response = await fetch(`http://api:8080/schedules/${targetId}`, {
+      const response = await fetch(`/api/schedules/${targetId}`, {
         method: "POST",
         headers: {
           // サーバーへ送るファイルはJSONファイルであることを宣言
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         // 送るデータをjson形式に変換
         body: JSON.stringify(payload),
-        credentials: 'include',
+        credentials: "include",
       });
 
-      if(!response.ok) {
-        throw new Error('Failed to add schedule');
+      if (!response.ok) {
+        throw new Error("Failed to add schedule");
       }
-      
+
       fetchSchedules();
       reset();
       handleCloseScheduleEditModal();
     } catch (error) {
-      console.error('Error adding schedule:', error);
+      console.error("Error adding schedule:", error);
       throw error;
     }
   };
 
   if (!scheduleEditModalState) {
-    return <></>
+    return <></>;
   }
 
   return (
     <section className={styles.orverlay}>
       <h1>予定を追加</h1>
 
-      {/* フォーム領域 */}  
-      <form onSubmit={handleSubmit(handlePostEditSchedule)} className={styles.formArea}>
+      {/* フォーム領域 */}
+      <form
+        onSubmit={handleSubmit(handlePostEditSchedule)}
+        className={styles.formArea}
+      >
         {/* 日時フィールド */}
         <div className={styles.inputArea}>
-          <InputField 
+          <InputField
             id="date"
             type="date"
             placeholder="日時"
-            register={register('date')}
+            register={register("date")}
           />
         </div>
         {/* 都道府県フィールド */}
         <div className={styles.inputArea}>
-          <SelectField 
-            id="prefectures"
-            register={register('prefectures')}
-          />
+          <SelectField id="prefectures" register={register("prefectures")} />
         </div>
         {/* 目的地1フィールド */}
         <div className={styles.inputArea}>
-          <InputField 
+          <InputField
             id="destination1"
             type="text"
             placeholder="目的地1"
-            register={register('destination1')}
+            register={register("destination1")}
           />
         </div>
         {/* 目的地2フィールド */}
         <div className={styles.inputArea}>
-          <InputField 
+          <InputField
             id="destination2"
             type="text"
             placeholder="目的地2"
-            register={register('destination2')}
+            register={register("destination2")}
           />
         </div>
         {/* 目的地3フィールド */}
         <div className={styles.inputArea}>
-          <InputField 
+          <InputField
             id="destination3"
             type="text"
             placeholder="目的地3"
-            register={register('destination3')}
+            register={register("destination3")}
           />
         </div>
-      
+
         {/* ボタンエリア */}
         <section className={styles.buttonArea}>
           {/* 変更ボタン */}
@@ -151,9 +157,14 @@ export const ScheduleEditModal = (props: Props) => {
             変更
           </button>
           {/* 戻るボタン */}
-          <div onClick={handleCloseScheduleEditModal} className={styles.backButton}>戻る</div>
+          <div
+            onClick={handleCloseScheduleEditModal}
+            className={styles.backButton}
+          >
+            戻る
+          </div>
         </section>
       </form>
     </section>
-  )
-}
+  );
+};

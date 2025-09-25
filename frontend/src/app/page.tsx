@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPenToSquare,
   faRightFromBracket,
-} from '@fortawesome/free-solid-svg-icons';
+} from "@fortawesome/free-solid-svg-icons";
 /**
  * data
  */
@@ -46,7 +46,7 @@ export default function Home() {
   React.useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch("http://api:8080/check_login", {
+        const response = await fetch("/api/check_login", {
           method: "GET",
           credentials: "include",
         });
@@ -60,30 +60,29 @@ export default function Home() {
           window.location.href = "/login";
         }
       } catch (error) {
-          console.error("Redirecting to login due to auth error:", error);
-          window.location.href = "/login";
+        console.error("Redirecting to login due to auth error:", error);
+        window.location.href = "/login";
       }
     };
 
     checkLoginStatus();
-  }, [])
-
+  }, []);
 
   /**
    * スケジュールをDBから取得
    */
   const fetchSchedules = async () => {
     try {
-      const response = await fetch("http://api:8080/schedules", {
+      const response = await fetch("/api/schedules", {
         method: "GET",
         credentials: "include",
-      })
+      });
       const rawData = await response.json();
       const transformedData = transformServerData(rawData);
 
       setScheduleList(transformedData);
     } catch (error) {
-      console.error('Failed to fetch schedules:', error);
+      console.error("Failed to fetch schedules:", error);
     }
   };
 
@@ -95,24 +94,25 @@ export default function Home() {
   /**
    * 最新のラベルを取得
    */
-  React.useEffect (() => {
+  React.useEffect(() => {
     const updateLabelsAndData = () => {
-      const uniqueLabels  = Array.from(
+      const uniqueLabels = Array.from(
         new Set(scheduleList.map((itme) => itme.prefectures))
       );
 
       // 各ラベルの出現回数を計算
-      const counts = uniqueLabels.map((label) => 
-        scheduleList.filter((item) => item.prefectures === label).length
+      const counts = uniqueLabels.map(
+        (label) =>
+          scheduleList.filter((item) => item.prefectures === label).length
       );
-  
+
       setLabelData(uniqueLabels);
       setCountData(counts);
     };
 
     updateLabelsAndData();
-  },[scheduleList]); // scheduleList が更新されたときに再実行
-  
+  }, [scheduleList]); // scheduleList が更新されたときに再実行
+
   /**
    * エディットモーダル開閉処理
    */
@@ -132,16 +132,16 @@ export default function Home() {
    */
   const onLogoutSbumit = async () => {
     try {
-      const response = await fetch("http://api:8080/logout", {
+      const response = await fetch("/api/logout", {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         credentials: "include", // クッキーを送信
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to add User');
+        throw new Error("Failed to add User");
       }
 
       // レスポンスデータを取得
@@ -155,31 +155,39 @@ export default function Home() {
         console.error("Redirect URL not provided");
       }
     } catch (error) {
-      console.error('Error adding User:', error);
+      console.error("Error adding User:", error);
       throw error;
     }
-  }
+  };
 
   return (
     <>
       {/* header領域 */}
-        <section className={styles.headerArea}>
-          <div onClick={() => setIsEditModalOpne(true)} className={styles.editArea}>
-            <FontAwesomeIcon icon={faPenToSquare} className={styles.far} />
-            <p>edit</p>
-          </div>
-          <EditModal 
-            isEditModalOpen={isEditModalOpen}
-            handleCloseEditModal={handleCloseEditModal}
-          />
-          <div className={styles.logoutArea} onClick={onLogoutSbumit}>
-              <FontAwesomeIcon icon={faRightFromBracket} className={styles.far} />
-              <p>logout</p>
-          </div>
-        </section>
+      <section className={styles.headerArea}>
+        <div
+          onClick={() => setIsEditModalOpne(true)}
+          className={styles.editArea}
+        >
+          <FontAwesomeIcon icon={faPenToSquare} className={styles.far} />
+          <p>edit</p>
+        </div>
+        <EditModal
+          isEditModalOpen={isEditModalOpen}
+          handleCloseEditModal={handleCloseEditModal}
+        />
+        <div className={styles.logoutArea} onClick={onLogoutSbumit}>
+          <FontAwesomeIcon icon={faRightFromBracket} className={styles.far} />
+          <p>logout</p>
+        </div>
+      </section>
       {/* ボタン表示領域 */}
       <section className={styles.buttonArea}>
-        <div onClick={() => setIsScheduleModalOpne(true)} className={styles.addButton}>予定を追加</div>
+        <div
+          onClick={() => setIsScheduleModalOpne(true)}
+          className={styles.addButton}
+        >
+          予定を追加
+        </div>
         <ScheduleModal
           isScheduleModalOpnen={isScheduleModalOpnen}
           handleCloseScheduleModal={handleCloseScheduleModal}
@@ -190,14 +198,13 @@ export default function Home() {
         </Link>
       </section>
       {/* 旅行の軌跡表示領域 */}
-        <section className={styles.trajectoryArea}>
-          <h2>旅行の軌跡</h2>
-          <Link href={"map"} className={styles.showMap}>地図を表示</Link>
-          <BarChart
-            labels={labelData}
-            data={countData}
-          />
-        </section>
+      <section className={styles.trajectoryArea}>
+        <h2>旅行の軌跡</h2>
+        <Link href={"map"} className={styles.showMap}>
+          地図を表示
+        </Link>
+        <BarChart labels={labelData} data={countData} />
+      </section>
     </>
   );
 }
