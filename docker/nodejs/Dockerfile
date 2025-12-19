@@ -18,8 +18,14 @@ WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install
 
-# アプリのソースをコピーしてビルド
+# アプリのソースをコピー
 COPY frontend ./
+
+# ビルド時に環境変数を受け取る
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# ビルド（環境変数が埋め込まれる）
 RUN npm run build
 
 # ポート公開
