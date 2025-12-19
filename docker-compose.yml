@@ -25,9 +25,9 @@ services:
       - DB_PASSWORD=password
       - DB_NAME=app
       # EC2用に追加
-      # - BASE_URL=http://localhost  # ローカル用
+      - BASE_URL=http://localhost  # ローカル用
       # EC2デプロイ時は以下に変更
-      - BASE_URL=http://43.206.214.36
+      # - BASE_URL=http://43.206.214.36
     networks:
       - app_network
 

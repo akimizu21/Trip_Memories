@@ -8,6 +8,10 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { InputField } from "@/components/ui/InputField/page";
 import { SelectField } from "@/components/ui/SelectField/page";
 /**
+ * api
+ */
+import { apiFetch } from "@/lib/api";
+/**
  * styles
  */
 import styles from "./ScheduleModal.module.css";
@@ -64,7 +68,7 @@ export const ScheduleModal = (props: Props) => {
     console.log(payload);
 
     try {
-      const response = await fetch("/api/schedules", {
+      const response = await apiFetch("/api/schedules", {
         method: "POST",
         headers: {
           // サーバーへ送るファイルはJSONファイルであることを宣言

@@ -1,6 +1,6 @@
 uvicorn
 fastapi
-PyMySQL
+psycopg2-binary
 sqlalchemy
 pytz
 python-dotenv
@@ -9,6 +9,5 @@ pydantic[email]
 passlib[bcrypt]
 itsdangerous
 python-jose[cryptography]
-jose
 PyJWT
 python-multipart

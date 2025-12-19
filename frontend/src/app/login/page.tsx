@@ -9,6 +9,10 @@ import Link from "next/link";
  */
 import { InputField } from "@/components/ui/InputField/page";
 /**
+ * api
+ */
+import { apiFetch } from "@/lib/api";
+/**
  * styels
  */
 import styles from "./page.module.css";
@@ -41,7 +45,7 @@ export default function Login() {
   const handlePostLogin: SubmitHandler<LoginForm> = async (data) => {
     console.log(data);
     try {
-      const response = await fetch("/api/login", {
+      const response = await apiFetch("/api/login", {
         method: "POST",
         headers: {
           // FastAPIのログインエンドポイントが OAuth2PasswordRequestForm を使用

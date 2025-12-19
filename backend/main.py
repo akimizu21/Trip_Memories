@@ -18,10 +18,15 @@ from schema import (CreateSchedule, CreateUser, EditSchedule, EditUser,
 
 app = FastAPI()
 
-# 環境変数からベースURLを取得（デフォルトはlocalhost）
-BASE_URL = os.getenv("BASE_URL", "http://localhost")
+# 環境変数から取得
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")  # development or production
 
-origins = [BASE_URL, f"{BASE_URL}:3000", f"{BASE_URL}:8080", "null"]
+# CORS設定
+origins = [
+    FRONTEND_URL,
+    "http://localhost:3000",  # ローカル開発用
+]
 
 # CORSを回避するために設定
 app.add_middleware(
@@ -63,15 +68,33 @@ async def create_user(user: CreateUser, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return {"state": "success", "redirect_url": f"{BASE_URL}/login"}
+    return {"state": "success", "redirect_url": f"{FRONTEND_URL}/login"}
+
+# --- クッキー設定のヘルパー関数 ---
+def get_cookie_settings():
+    """環境に応じたクッキー設定を返す"""
+    if ENVIRONMENT == "production":
+        return {
+            "httponly": True,
+            "secure": True,           # HTTPS必須
+            "samesite": "none",       # クロスドメイン許可
+            "max_age": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        }
+    else:
+        return {
+            "httponly": True,
+            "secure": False,
+            "samesite": "lax",
+            "max_age": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        }
 
 
-# ログイン処理
+
+# ログイン処理（修正版）
 @app.post("/login", summary="ログイン", response_model=LoginResponse)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
-    # データベースを使ったユーザー認証
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -79,30 +102,30 @@ async def login(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    # アクセストークンを発行
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"user_name": str(user.user_name)}, expires_delta=access_token_expires
     )
 
-    # クッキーにアクセストークンを設定
     response = JSONResponse(
         content={
             "status": "success",
-            "redirect_url": f"{BASE_URL}/",  # 動的なダッシュボードURL
-            "access_token": access_token,  # トークンをレスポンスボディに含める
-            "token_type": "bearer",  # トークンタイプも明示
+            "redirect_url": f"{FRONTEND_URL}/",
+            "access_token": access_token,
+            "token_type": "bearer",
         }
     )
+    
+    # 環境に応じたクッキー設定
+    cookie_settings = get_cookie_settings()
     response.set_cookie(
         key="access_token",
         value=f"Bearer {access_token}",
-        httponly=True,
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        **cookie_settings
     )
 
     return response
-
 
 # ログアウト処理
 @app.post("/logout", summary="ログアウト", response_model=None)
@@ -110,7 +133,7 @@ def logout(response: Response):
     # クライアント側のクッキー削除
     response.delete_cookie("access_token")
 
-    return {"state": "success", "redirect_url": f"{BASE_URL}/login"}
+    return {"state": "success", "redirect_url": f"{FRONTEND_URL}/login"}
 
 
 # user情報変更処理

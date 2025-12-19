@@ -21,6 +21,10 @@ import { EditModal } from "@/components/layout/EditModal/page";
 import { ScheduleModal } from "@/components/layout/ScheduleModal/page";
 import { BarChart } from "@/components/layout/BarChart/page";
 /**
+ * api
+ */
+import { apiFetch } from "@/lib/api";
+/**
  * styles
  */
 import styles from "./page.module.css";
@@ -46,7 +50,7 @@ export default function Home() {
   React.useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch("/api/check_login", {
+        const response = await apiFetch("/api/check_login", {
           method: "GET",
           credentials: "include",
         });
@@ -73,7 +77,7 @@ export default function Home() {
    */
   const fetchSchedules = async () => {
     try {
-      const response = await fetch("/api/schedules", {
+      const response = await apiFetch("/api/schedules", {
         method: "GET",
         credentials: "include",
       });
@@ -132,7 +136,7 @@ export default function Home() {
    */
   const onLogoutSbumit = async () => {
     try {
-      const response = await fetch("/api/logout", {
+      const response = await apiFetch("/api/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

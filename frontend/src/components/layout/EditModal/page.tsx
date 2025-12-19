@@ -7,6 +7,10 @@ import { useForm, SubmitHandler } from "react-hook-form";
  */
 import { InputField } from "@/components/ui/InputField/page";
 /**
+ * api
+ */
+import { apiFetch } from "@/lib/api";
+/**
  * styles
  */
 import styles from "./EditModal.module.css"
@@ -53,7 +57,7 @@ export const EditModal = (props: Props) => {
     const handlePostEditUser: SubmitHandler<EditForm> = async (data) => {
       console.log("Sending data:", data); // 送信データのログ
       try {
-        const response = await fetch("/api/edit_users", {
+        const response = await apiFetch("/api/edit_users", {
           method: "POST",
           headers: {
             'Content-Type': 'application/json',

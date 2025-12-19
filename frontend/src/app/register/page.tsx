@@ -10,6 +10,10 @@ import Link from "next/link";
  */
 import { InputField } from "@/components/ui/InputField/page";
 /**
+ * api
+ */
+import { apiFetch } from "@/lib/api";
+/**
  * styels
  */
 import styles from "./page.module.css"
@@ -45,7 +49,7 @@ export default function Register() {
   const handlePostUser: SubmitHandler<RegisterForm> = async (data) => {
     console.log(data);
     try {
-      const response = await fetch("/api/users", {
+      const response = await apiFetch("/api/users", {
         method: "POST",
         headers: {
           // 

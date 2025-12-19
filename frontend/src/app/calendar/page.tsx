@@ -17,6 +17,10 @@ import { Schedule, transformServerData } from "@/constants/data";
 import { Calendar as ScheduleCalendar } from "@/components/layout/Calendar/page";
 import { ScheduleEditModal } from "@/components/layout/ScheduleEditModal/page";
 /**
+ * api
+ */
+import { apiFetch } from "@/lib/api";
+/**
  * styels
  */
 import styels from "./page.module.css";
@@ -53,7 +57,7 @@ export default function Calendar() {
    */
   const fetchSchedules = async () => {
     try {
-      const response = await fetch("/api/schedules", {
+      const response = await apiFetch("/api/schedules", {
         method: "GET",
         credentials: "include",
       });
