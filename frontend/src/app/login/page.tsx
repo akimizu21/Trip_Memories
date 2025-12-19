@@ -13,7 +13,7 @@ import { InputField } from "@/components/ui/InputField/page";
  */
 import { apiFetch } from "@/lib/api";
 /**
- * styels
+ * styles
  */
 import styles from "./page.module.css";
 

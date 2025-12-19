@@ -21,9 +21,9 @@ import { ScheduleEditModal } from "@/components/layout/ScheduleEditModal/page";
  */
 import { apiFetch } from "@/lib/api";
 /**
- * styels
+ * styles
  */
-import styels from "./page.module.css";
+import styles from "./page.module.css";
 
 export default function Calendar() {
   // 本日の日付を取得
@@ -122,7 +122,7 @@ export default function Calendar() {
    * @param targetId
    */
   const handleDeleteScheduleRequest = async (targetId: number) => {
-    fetch(`/api/schedules/${targetId}`, {
+    apiFetch(`/schedules/${targetId}`, {
       method: "DELETE",
       credentials: "include",
     })
@@ -155,53 +155,53 @@ export default function Calendar() {
   return (
     <>
       {/* header領域 */}
-      <section className={styels.headerArea}>
-        <h1 className={styels.headerTitle}>カレンダー</h1>
-        <Link href={"/"} className={styels.homeLink}>
-          <FontAwesomeIcon icon={faHouse} className={styels.farHome} />
+      <section className={styles.headerArea}>
+        <h1 className={styles.headerTitle}>カレンダー</h1>
+        <Link href={"/"} className={styles.homeLink}>
+          <FontAwesomeIcon icon={faHouse} className={styles.farHome} />
           <p>Home</p>
         </Link>
       </section>
 
       {/* カレンダー領域 */}
-      <section className={styels.calendarArea}>
+      <section className={styles.calendarArea}>
         <ScheduleCalendar events={events} />
       </section>
 
       {/* 予定領域 */}
-      <section className={styels.scheduleArea}>
+      <section className={styles.scheduleArea}>
         {/* 日時表示エリア */}
-        <div className={styels.dateArea}>
-          <p className={styels.date}>
+        <div className={styles.dateArea}>
+          <p className={styles.date}>
             Today : {today.getFullYear()}.{today.getMonth() + 1}.
             {today.getDate()}
           </p>
-          <p className={styels.date}>{weekdays}</p>
+          <p className={styles.date}>{weekdays}</p>
         </div>
         {/* 予定カード表示エリア */}
-        <ul className={styels.scheduleList}>
+        <ul className={styles.scheduleList}>
           {scheduleList.map((schedule: any) => {
             return (
-              <li className={styels.scheduleCard} key={schedule.id}>
+              <li className={styles.scheduleCard} key={schedule.id}>
                 <div>
                   {/* スケジュールの都道府県名と日程 */}
-                  <span className={styels.scheduleTitle}>
+                  <span className={styles.scheduleTitle}>
                     <p>旅先 : {schedule.prefectures}</p>
                     <p>日程 : {schedule.date}</p>
                   </span>
                   {/* スケジュールの目的地 */}
-                  <ul className={styels.destinations}>
-                    <li className={styels.destination}>
+                  <ul className={styles.destinations}>
+                    <li className={styles.destination}>
                       目的地1 : {schedule.destination1}
                     </li>
                     {schedule.destination2 && (
-                      <li className={styels.destination}>
+                      <li className={styles.destination}>
                         目的地2 : {schedule.destination2}
                       </li>
                     )}{" "}
                     {/* 空でなければ表示する */}
                     {schedule.destination3 && (
-                      <li className={styels.destination}>
+                      <li className={styles.destination}>
                         目的地3 : {schedule.destination3}
                       </li>
                     )}{" "}
@@ -209,11 +209,11 @@ export default function Calendar() {
                   </ul>
                 </div>
                 {/* アイコン */}
-                <div className={styels.iconArea}>
+                <div className={styles.iconArea}>
                   <FontAwesomeIcon
                     icon={faPen}
                     onClick={() => handleOpenScheduleEditModal(schedule.id)}
-                    className={styels.far}
+                    className={styles.far}
                   />
                   <ScheduleEditModal
                     scheduleEditModalState={scheduleEditModalState.isOpen}
@@ -226,7 +226,7 @@ export default function Calendar() {
                     onClick={() =>
                       handleDeleteSchedule(schedule.id, schedule.prefectures)
                     }
-                    className={styels.far}
+                    className={styles.far}
                   />
                 </div>
               </li>

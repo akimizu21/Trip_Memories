@@ -1,11 +1,18 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { scaleLinear } from "d3-scale";
 import { Feature } from "geojson";
 /**
- * styels
+ * api
+ */
+import { apiFetch } from "@/lib/api";
+/**
+ * styles
  */
 import styles from "./page.module.css";
 
@@ -34,7 +41,7 @@ export default function Map() {
 
   // スケジュールAPIからデータを取得し、都道府県カウントをセット
   React.useEffect(() => {
-    fetch("/api/schedules", {
+    apiFetch("/schedules", {
       credentials: "include",
     })
       .then((response) => response.json())
@@ -51,14 +58,17 @@ export default function Map() {
     .range(["#e0f3f3", "#006666"]);
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "1000px", // 最大幅の制限（適宜調整可能）
-        margin: "0 auto", // 中央寄せ
-        aspectRatio: "3 / 2", // アスペクト比を維持（画面に収まる比率）
-      }}
-    >
+    <div className={styles.wrapper}>
+      
+      {/* header領域 */}
+      <section className={styles.headerArea}>
+        <h1 className={styles.headerTitle}>カレンダー</h1>
+        <Link href={"/"} className={styles.homeLink}>
+          <FontAwesomeIcon icon={faHouse} className={styles.farHome} />
+          <p>Home</p>
+        </Link>
+      </section>
+
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
