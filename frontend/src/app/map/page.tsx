@@ -59,10 +59,10 @@ export default function Map() {
 
   return (
     <div className={styles.wrapper}>
-      
+
       {/* header領域 */}
       <section className={styles.headerArea}>
-        <h1 className={styles.headerTitle}>カレンダー</h1>
+        <h1 className={styles.headerTitle}>行き先一覧</h1>
         <Link href={"/"} className={styles.homeLink}>
           <FontAwesomeIcon icon={faHouse} className={styles.farHome} />
           <p>Home</p>
