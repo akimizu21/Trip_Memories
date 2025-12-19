@@ -50,7 +50,7 @@ export default function Home() {
   React.useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await apiFetch("/api/check_login", {
+        const response = await apiFetch("/check_login", {
           method: "GET",
           credentials: "include",
         });
@@ -77,7 +77,7 @@ export default function Home() {
    */
   const fetchSchedules = async () => {
     try {
-      const response = await apiFetch("/api/schedules", {
+      const response = await apiFetch("/schedules", {
         method: "GET",
         credentials: "include",
       });
@@ -136,7 +136,7 @@ export default function Home() {
    */
   const onLogoutSbumit = async () => {
     try {
-      const response = await apiFetch("/api/logout", {
+      const response = await apiFetch("/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

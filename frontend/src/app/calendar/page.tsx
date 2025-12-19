@@ -57,7 +57,7 @@ export default function Calendar() {
    */
   const fetchSchedules = async () => {
     try {
-      const response = await apiFetch("/api/schedules", {
+      const response = await apiFetch("/schedules", {
         method: "GET",
         credentials: "include",
       });

@@ -68,7 +68,7 @@ export const ScheduleModal = (props: Props) => {
     console.log(payload);
 
     try {
-      const response = await apiFetch("/api/schedules", {
+      const response = await apiFetch("/schedules", {
         method: "POST",
         headers: {
           // サーバーへ送るファイルはJSONファイルであることを宣言
