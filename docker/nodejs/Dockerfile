@@ -31,5 +31,5 @@ RUN npm run build
 # ポート公開
 EXPOSE 3000
 
-# Next.js 本番起動
-CMD ["npm", "start"]
+# Next.js 本番起動（0.0.0.0にバインド + PORT環境変数を使用）
+CMD ["sh", "-c", "npm start -- -H 0.0.0.0 -p ${PORT:-3000}"]
