@@ -30,7 +30,21 @@ const options: ChartOptions<"bar"> = {
     legend: {
       position: "top"
     },
-  }
+  },
+  scales: {
+    x: {
+      grid: {
+        lineWidth: 0.5, // 縦線
+        color: "#ddd", // 線の色
+      },
+    },
+    y: {
+      grid: {
+        lineWidth: 0.5, // 横線
+        color: "#ddd", // 線の色
+      },
+    },
+  },
 };
 
 // Propsの型定義
@@ -42,13 +56,24 @@ interface Props {
 export const BarChart = (props: Props) => {
   const {labels, data} = props;
 
+  // 多い順にソート
+  const combined = labels.map((label, index) => ({
+    label,
+    value: data[index]
+  }));
+  combined.sort((a, b) => b.value - a.value); // 降順ソート
+
+  const sortedLabels = combined.map((itemm) => itemm.label);
+  const sortedData = combined.map((item) => item.value)
+
   const chartData = {
-    labels,
+    labels: sortedLabels,
     datasets: [
       {
         label: "旅行先一覧",
-        data,
-        backgroundColor: "#CCE0AC"
+        data: sortedData,
+        backgroundColor: "#CCE0AC",
+        barThickness: 20, //バーの太さ
       },
     ]
   };
