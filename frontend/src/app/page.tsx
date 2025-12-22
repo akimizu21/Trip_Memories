@@ -212,7 +212,7 @@ export default function Home() {
           地図を表示
         </Link>
         {/* 都道府県制覇率表示 */}
-        <p>47都道府県中 {visitedPrefectures}県 制覇! ({completionRate}%) </p>
+        <p className={styles.completionRate}>47都道府県中 {visitedPrefectures}県 制覇! ({completionRate}%) </p>
         <BarChart labels={labelData} data={countData} />
       </section>
     </>
