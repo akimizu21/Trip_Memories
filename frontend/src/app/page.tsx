@@ -164,6 +164,10 @@ export default function Home() {
     }
   };
 
+  // 都道府県制覇率計算
+  const visitedPrefectures = new Set(scheduleList.map(s => s.prefectures)).size;
+  const completionRate = Math.round((visitedPrefectures / 47) * 100);
+
   return (
     <>
       {/* header領域 */}
@@ -207,6 +211,8 @@ export default function Home() {
         <Link href={"map"} className={styles.showMap}>
           地図を表示
         </Link>
+        {/* 都道府県制覇率表示 */}
+        <p>47都道府県中 {visitedPrefectures}県 制覇! ({completionRate}%) </p>
         <BarChart labels={labelData} data={countData} />
       </section>
     </>
