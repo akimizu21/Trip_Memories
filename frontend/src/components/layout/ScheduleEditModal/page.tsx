@@ -156,10 +156,6 @@ export const ScheduleEditModal = (props: Props) => {
 
         {/* ボタンエリア */}
         <section className={styles.buttonArea}>
-          {/* 変更ボタン */}
-          <button type="submit" className={styles.registerButton}>
-            変更
-          </button>
           {/* 戻るボタン */}
           <div
             onClick={handleCloseScheduleEditModal}
@@ -167,6 +163,10 @@ export const ScheduleEditModal = (props: Props) => {
           >
             戻る
           </div>
+          {/* 変更ボタン */}
+          <button type="submit" className={styles.registerButton}>
+            変更
+          </button>
         </section>
       </form>
     </section>

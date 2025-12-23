@@ -142,14 +142,14 @@ export const EditModal = (props: Props) => {
         </div>
         {/* ボタンエリア */}
         <section className={styles.buttonArea}>
-          {/* 新規登録ボタン */}
-          <button type="submit" className={styles.registerButton}>
-            変更
-          </button>
           {/* 戻るボタン */}
           <div onClick={handleCloseEditModal} className={styles.backButton}>
             戻る
           </div>
+          {/* 新規登録ボタン */}
+          <button type="submit" className={styles.registerButton}>
+            変更
+          </button>
         </section>
       </form>
     </section>

@@ -85,7 +85,7 @@ export const BarChart = (props: Props) => {
       {
         label: "旅行先一覧",
         data: sortedData,
-        backgroundColor: "#CCE0AC",
+        backgroundColor: "#60A5FA", // バーの色
         barThickness: 20, //バーの太さ
       },
     ]
